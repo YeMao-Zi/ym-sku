@@ -1,0 +1,18 @@
+{
+    "name": "ym-sku",
+    "description": "基于 Vue3 的 sku 数据处理,为了更好的自定义样式,ui 自主实现,只提供数据处理",
+    "version": "1.0.0",
+    "private": false,
+    "main": "index.js",
+    "author": {
+      "name": "zhushengjie"
+    },
+    "keywords": [
+      "sku",
+      "vue3"
+    ],
+    "dependencies": {
+      "ym-userequest": "^0.0.1"
+    }
+  }
+  
