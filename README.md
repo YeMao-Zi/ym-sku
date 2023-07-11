@@ -11,8 +11,6 @@
 npm install ym-sku
 ```
 
-hbuilderx 导入的路径应该是这个 `@/js_sdk/ym-sku/ym-sku` 
-
 ## 使用
 
 ```vue
@@ -38,7 +36,6 @@ hbuilderx 导入的路径应该是这个 `@/js_sdk/ym-sku/ym-sku`
 
 <script lang="ts" setup>
 import { myUseSkuState, skuInfoPropsType } from "ym-sku";
-// import { myUseSkuState, skuInfoPropsType } from "@/js_sdk/ym-sku/ym-sku"; 如果是 Hubilder 导入可能是这个路径，找到这个文件即可
 
 interface propsType {
   properties: skuInfoPropsType.properties;
