@@ -1,37 +1,33 @@
-import { reactive } from 'vue';
-import {
-  skuInfoPropsType,
-  skuInfoSettingType,
-  skuInfoPropsDefaultType,
-} from './type';
+import { reactive } from "vue";
+import { skuInfoPropsType, skuInfoSettingType, skuInfoPropsDefaultType } from "./type";
 
 function objectEqual(obj1: any, obj2: any): boolean {
-    if (typeof obj1 !== "object" || typeof obj2 !== "object") {
-      throw new TypeError("parameter must typeof object");
-    }
-    const obj1Constructor = obj1.constructor;
-    const obj2Constructor = obj2.constructor;
-  
-    if (obj1Constructor !== obj2Constructor) {
+  if (typeof obj1 !== "object" || typeof obj2 !== "object") {
+    throw new TypeError("parameter must typeof object");
+  }
+  const obj1Constructor = obj1.constructor;
+  const obj2Constructor = obj2.constructor;
+
+  if (obj1Constructor !== obj2Constructor) {
+    return false;
+  }
+
+  if (obj1 instanceof Array) {
+    return ArrayEqual(obj1, obj2);
+  } else {
+    const entries1 = Object.entries(obj1);
+    const entries2 = Object.entries(obj2);
+    return ArrayEqual(entries1, entries2);
+  }
+
+  function ArrayEqual(arr1: any, arr2: any) {
+    if (JSON.stringify(arr1.sort()) == JSON.stringify(arr2.sort())) {
+      return true;
+    } else {
       return false;
     }
-  
-    if (obj1 instanceof Array) {
-      return ArrayEqual(obj1, obj2);
-    } else {
-      const entries1 = Object.entries(obj1);
-      const entries2 = Object.entries(obj2);
-      return ArrayEqual(entries1, entries2);
-    }
-  
-    function ArrayEqual(arr1: any, arr2: any) {
-      if (JSON.stringify(arr1.sort()) == JSON.stringify(arr2.sort())) {
-        return true;
-      } else {
-        return false;
-      }
-    }
   }
+}
 
 const dataSource: skuInfoSettingType = reactive({
   properties: [], // property 列表
@@ -40,13 +36,13 @@ const dataSource: skuInfoSettingType = reactive({
   vertexList: [], // 顶点数组
   selectedAttrs: [], // 当前已选的 attribute 列表
   selectedSkuInfo: null, // 当前已选中的sku选项信息
-  skuId: '', // skuList组合中当前选中的的skuId,可以设置默认skuid(默认选中状态)
+  skuId: "", // skuList组合中当前选中的的skuId,可以设置默认skuid(默认选中状态)
 });
 
 const getInit = (props: skuInfoPropsDefaultType) => {
   dataSource.properties = props.properties;
   dataSource.skuList = props.skuList;
-  dataSource.skuId = props.defaultSkuId || props.skuList[0].id;
+  dataSource.skuId = props.defaultSkuId || "";
   initEmptyAdjMatrix();
   setAdjMatrixValue();
   // 默认选中项
@@ -72,14 +68,14 @@ const setAdjMatrixValue = () => {
     associateAttributes(sku.attributes, sku.id);
   });
   dataSource.properties.forEach((prop) => {
-    associateAttributes(prop.attributes, '1');
+    associateAttributes(prop.attributes, "1");
   });
 };
 
 // 将 attributes 属性组中的属性在无向图中联系起来
 const associateAttributes = (
   attributes: string[] | Array<skuInfoPropsType.propertiesAttribute>,
-  skuId: skuInfoPropsType.defaultSkuId,
+  skuId: skuInfoPropsType.defaultSkuId
 ) => {
   attributes.forEach((attr1) => {
     attributes.forEach((attr2) => {
@@ -107,8 +103,7 @@ const associateAttributes = (
 
 // 根据skuid选中标签
 const selectedAttrsBySkuId = (skuid: skuInfoPropsType.defaultSkuId) => {
-  dataSource.selectedSkuInfo =
-    dataSource.skuList.find((item) => item.id === skuid) || null;
+  dataSource.selectedSkuInfo = dataSource.skuList.find((item) => item.id === skuid) || null;
   dataSource.selectedSkuInfo?.attributes.forEach((item: string) => {
     dataSource.properties.forEach((property, propertyIndex) => {
       property.attributes.forEach((attr, attributeIndex) => {
@@ -121,14 +116,8 @@ const selectedAttrsBySkuId = (skuid: skuInfoPropsType.defaultSkuId) => {
 };
 
 // 判断当前 attribute 是否可选，返回 true 表示可选，返回 false 表示不可选，选项置灰
-const canAttributeSelect = (
-  attribute: skuInfoPropsType.propertiesAttribute,
-) => {
-  if (
-    !dataSource.selectedAttrs ||
-    !dataSource.selectedAttrs.length ||
-    attribute.isActive
-  ) {
+const canAttributeSelect = (attribute: skuInfoPropsType.propertiesAttribute) => {
+  if (!dataSource.selectedAttrs || !dataSource.selectedAttrs.length || attribute.isActive) {
     return true;
   }
 
@@ -141,22 +130,17 @@ const canAttributeSelect = (
 
   if (res.some((item) => item === 0)) {
     return false;
-  } else if (res.some((item) => item.has('1'))) {
+  } else if (res.some((item) => item.has("1"))) {
     return true;
   } else {
     const first = res[0];
     const others = res.slice(1);
-    return Array.from(first).some((skuId) =>
-      others.every((item) => item.has(skuId)),
-    );
+    return Array.from(first).some((skuId) => others.every((item) => item.has(skuId)));
   }
 };
 
 // 当点击某个 attribute 时，如：黑色
-const handleClickAttribute = (
-  propertyIndex: number,
-  attributeIndex: number,
-) => {
+const handleClickAttribute = (propertyIndex: number, attributeIndex: number) => {
   setAttributestate(propertyIndex, attributeIndex);
   getSelectSku();
 };
@@ -176,8 +160,7 @@ const setAttributestate = (propertyIndex: number, attributeIndex: number) => {
   if (isActive === false) {
     dataSource.selectedSkuInfo = null;
   }
-  dataSource.properties[propertyIndex].attributes[attributeIndex].isActive =
-    isActive;
+  dataSource.properties[propertyIndex].attributes[attributeIndex].isActive = isActive;
   if (isActive) {
     dataSource.properties[propertyIndex].attributes.forEach((attr, index) => {
       if (index !== attributeIndex) {
@@ -214,7 +197,7 @@ const getSelectSku = () => {
   if (dataSource.selectedSkuInfo?.id) {
     dataSource.skuId = dataSource.selectedSkuInfo.id;
   } else {
-    dataSource.skuId = '';
+    dataSource.skuId = "";
   }
 };
 
@@ -233,11 +216,8 @@ const getUnchooseLabel = () => {
 };
 
 const myUseSkuState = (
-  initialValue: skuInfoPropsDefaultType,
-): [
-  skuInfoSettingType,
-  (propertyIndex: number, attributeIndex: number) => void,
-] => {
+  initialValue: skuInfoPropsDefaultType
+): [skuInfoSettingType, (propertyIndex: number, attributeIndex: number) => void] => {
   if (dataSource.properties.length === 0) {
     console.log(initialValue);
     getInit(initialValue);
@@ -245,10 +225,4 @@ const myUseSkuState = (
   return [dataSource, handleClickAttribute];
 };
 
-export {
-  getInit,
-  dataSource,
-  handleClickAttribute,
-  getUnchooseLabel,
-  myUseSkuState,
-};
+export { getInit, dataSource, handleClickAttribute, getUnchooseLabel, myUseSkuState };

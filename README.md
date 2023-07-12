@@ -2,6 +2,7 @@
 
 基于 vue3 + ts + hooks 的响应式 sku 数据处理插件
 为了样式的可定制化,只处理 sku 数据,UI 可自己随意绘制
+基本能实现所有你想要的功能
 
 ## 安装
 
@@ -35,7 +36,7 @@ npm install ym-sku
 </template>
 
 <script lang="ts" setup>
-import { myUseSkuState, skuInfoPropsType } from "ym-sku";
+import { myUseSkuState,type skuInfoPropsType } from "ym-sku";
 
 interface propsType {
   properties: skuInfoPropsType.properties;
@@ -156,4 +157,21 @@ const dataSource: skuInfoSettingType = reactive({
   selectedSkuInfo: null, // 当前已选中的sku选项信息
   skuId: "", // skuList组合中当前选中的的skuId,可以设置默认skuid(默认选中状态)
 });
+```
+
+### 个性化
+
+``` ts
+import {
+  myUseSkuState,
+  type skuInfoPropsType,
+  getInit,
+  getUnchooseLabel,
+} from '@/ym-sku/index';
+const test = () => {
+ // 手动控制属性，这里是更改了选中的sku, 你也可以修改 properties 或 skuList，
+  getInit({ properties, skuList, defaultSkuId: skuList[1].id });
+  // 获取未选择标签
+  console.log(getUnchooseLabel()); 
+};
 ```

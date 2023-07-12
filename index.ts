@@ -1,14 +1,14 @@
 export {
-    getInit,
-    dataSource,
-    handleClickAttribute,
-    getUnchooseLabel,
-    myUseSkuState,
+  getInit,
+  dataSource,
+  handleClickAttribute,
+  getUnchooseLabel,
+  myUseSkuState,
 } from "./lib/skuHooks";
 
-export {
-    skuInfoPropsType,
-    skuInfoSettingType,
-    skuInfoPropsDefaultType,
-    skuInfoEmit
-} from './lib/type'
+export type {
+  skuInfoPropsType,
+  skuInfoSettingType,
+  skuInfoPropsDefaultType,
+  skuInfoEmit,
+} from "./lib/type";
