@@ -123,12 +123,12 @@ const [dataSource, handleClickAttribute] = myUseSkuState(props);
   flex-direction: row;
   align-items: center;
   justify-content: center;
-  padding: 5rpx 20rpx;
+  padding: 5px 20px;
   text-align: center;
   margin: 10rpx 0;
   background: #ffffff;
   border-radius: 10rpx;
-  border: 2rpx solid #a6a6a6;
+  border: 2px solid #a6a6a6;
   font-size: 14px;
   color: rgba(0, 0, 0, 0.85);
   margin-right: 20rpx;
@@ -139,7 +139,7 @@ const [dataSource, handleClickAttribute] = myUseSkuState(props);
 }
 
 .seletedSpecifications {
-  border: 2rpx solid #fb6e23;
+  border: 2px solid #fb6e23;
 }
 </style>
 ```
