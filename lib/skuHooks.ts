@@ -183,6 +183,12 @@ const setAttributestate = (propertyIndex: number, attributeIndex: number) => {
       attr.isDisabled = !canAttributeSelect(attr);
     });
   });
+
+  if(dataSource.properties.length===3){ // 处理三规格时会出现的权边问题
+    if(getUnchooseLabel().length==1){
+      
+    }
+  }
 };
 
 // 判断是否选中sku并获取
@@ -219,7 +225,6 @@ const myUseSkuState = (
   initialValue: skuInfoPropsDefaultType
 ): [skuInfoSettingType, (propertyIndex: number, attributeIndex: number) => void] => {
   if (dataSource.properties.length === 0) {
-    console.log(initialValue);
     getInit(initialValue);
   }
   return [dataSource, handleClickAttribute];

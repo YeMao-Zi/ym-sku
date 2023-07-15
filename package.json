@@ -1,19 +1,35 @@
 {
-    "name": "ym-sku",
-    "description": "基于 Vue3 的 sku 数据处理,为了更好的自定义样式,ui 自主实现,只提供数据处理",
-    "version": "1.0.3",
-    "private": false,
-    "main": "index.js",
-    "author": {
-      "name": "zhushengjie"
-    },
-    "repository": {
-      "type": "git",
-      "url": "https://github.com/YeMao-Zi/ym-sku"
-    },
-    "keywords": [
-      "sku",
-      "vue3"
-    ]
-  }
-  
+  "name": "ym-sku",
+  "description": "test",
+  "version": "1.0.4",
+  "private": false,
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "author": {
+    "name": "zhushengjie"
+  },
+  "scripts": {
+    "build": "tsc",
+    "test": "jest --config jestconfig.json"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/YeMao-Zi/ym-sku"
+  },
+  "keywords": [
+    "sku",
+    "vue3"
+  ],
+  "devDependencies": {
+    "@types/jest": "^29.5.3",
+    "jest": "^29.6.1",
+    "ts-jest": "^29.1.1",
+    "typescript": "^5.1.6"
+  },
+  "dependencies": {
+    "vue": "^3.3.4"
+  },
+  "files": [
+    "dist/**/*"
+  ]
+}
