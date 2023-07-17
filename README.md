@@ -38,12 +38,6 @@ npm install ym-sku
 <script lang="ts" setup>
 import { myUseSkuState,type skuInfoPropsType } from "ym-sku";
 
-interface propsType {
-  properties: skuInfoPropsType.properties;
-  skuList: skuInfoPropsType.skuList;
-  defaultSkuId?: skuInfoPropsType.defaultSkuId; //默认选中id
-}
-
 // data.ts
 const properties = [
   {
@@ -103,7 +97,7 @@ const skuList = [
   },
 ];
 
-const props: propsType = {
+const props = {
   properties,
   skuList,
 };
@@ -148,29 +142,25 @@ const [dataSource, handleClickAttribute] = myUseSkuState(props);
 ### 其中返回的 dataSource 说明
 
 ```js
-const dataSource: skuInfoSettingType = reactive({
+const dataSource = {
   properties: [], // property 列表
   skuList: [], // sku 列表
-  matrix: [], // 邻接矩阵存储无向图
-  vertexList: [], // 顶点数组
-  selectedAttrs: [], // 当前已选的 attribute 列表
-  selectedSkuInfo: null, // 当前已选中的sku选项信息
+  selected: [], // 当前已选的 attribute 列表
   skuId: "", // skuList组合中当前选中的的skuId,可以设置默认skuid(默认选中状态)
-});
+};
 ```
 
-### 个性化
+### 自定义
 
 ``` ts
 import {
   myUseSkuState,
-  type skuInfoPropsType,
-  getInit,
+  init,
   getUnchooseLabel,
 } from '@/ym-sku/index';
 const test = () => {
  // 手动控制属性，这里是更改了选中的sku, 你也可以修改 properties 或 skuList，
-  getInit({ properties, skuList, defaultSkuId: skuList[1].id });
+  init({ properties, skuList, defaultSkuId: skuList[1].id });
   // 获取未选择标签
   console.log(getUnchooseLabel()); 
 };

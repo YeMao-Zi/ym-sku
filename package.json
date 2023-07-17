@@ -1,7 +1,7 @@
 {
   "name": "ym-sku",
-  "description": "test",
-  "version": "1.0.4",
+  "description": "基于 vue3 + ts + hooks 的响应式 sku 数据处理插件, 为了样式的可定制化,只处理 sku 数据,UI 可自己随意绘制",
+  "version": "1.0.5",
   "private": false,
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
