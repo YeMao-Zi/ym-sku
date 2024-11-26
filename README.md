@@ -29,7 +29,7 @@ npm install ym-sku
           attribute.isDisabled ? 'disabledStyle' : '',
         ]"
       >
-        <div>{{ attribute.value }}</div>
+        <div>{{ attribute?.label || attribute.value }}</div>
       </div>
     </div>
   </div>
@@ -38,16 +38,15 @@ npm install ym-sku
 <script lang="ts" setup>
 import { useSku } from "ym-sku";
 
-// data.ts
 const properties = [
   {
     name: "Size",
     attributes: [
-      { value: "S", isActive: false, isDisabled: false },
-      { value: "M", isActive: false, isDisabled: false },
-      { value: "L", isActive: false, isDisabled: false },
-      { value: "Y", isActive: false, isDisabled: false },
-      { value: "B", isActive: false, isDisabled: false },
+      { label: "S", value: "S", isActive: false, isDisabled: false },
+      { label: "S", value: "M", isActive: false, isDisabled: false },
+      { label: "L", value: "L", isActive: false, isDisabled: false },
+      { label: "Y", value: "Y", isActive: false, isDisabled: false },
+      { label: "B", value: "B", isActive: false, isDisabled: false },
     ],
   },
   {
@@ -60,8 +59,8 @@ const properties = [
   {
     name: "Figure ",
     attributes: [
-      { value: "stripe", isActive: false, isDisabled: false },
-      { value: "wave", isActive: false, isDisabled: false },
+      { label: "", value: "stripe", isActive: false, isDisabled: false },
+      { label: "", value: "wave", isActive: false, isDisabled: false },
     ],
   },
 ];

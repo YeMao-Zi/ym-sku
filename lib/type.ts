@@ -4,6 +4,7 @@ export type Properties = {
     value: string;
     isActive: boolean;
     isDisabled: boolean;
+    [k: string]: any;
   }[];
 }[];
 
