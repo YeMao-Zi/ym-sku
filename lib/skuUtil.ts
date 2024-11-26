@@ -98,7 +98,8 @@ export class PathFinder {
     // 得到每个可操作的 SKU 质数的集合
     for (let i = 0; i < this.openWay.length; i++) {
       // eslint-disable-next-line no-eval
-      this.openWay[i] = eval(this.openWay[i].join("*"));
+      // this.openWay[i] = eval(this.openWay[i].join("*"));
+      this.openWay[i] = this.openWay[i].reduce((c: number, n: number) => c * n);
     }
     // return 初始化得到规格位置，规格默认可选处理，可选 SKU 的规格对应的质数合集
     this._check();

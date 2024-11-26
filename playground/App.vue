@@ -1,20 +1,3 @@
-## 介绍
-
-基于 vue3 + ts + hooks 的响应式 sku 数据处理插件
-为了样式的可定制化,只处理 sku 数据,UI 可自己随意绘制
-基本功能应该都能实现
-
-## 安装
-
-### npm 安装
-
-```
-npm install ym-sku
-```
-
-## 使用
-
-```vue
 <template>
   <div v-for="(item, propertyIndex) in dataSource.properties" :key="propertyIndex">
     <div>{{ item.name }}</div>
@@ -23,11 +6,8 @@ npm install ym-sku
         v-for="(attribute, attributeIndex) in item.attributes"
         :key="attributeIndex"
         @click="handleClickAttribute(propertyIndex, attributeIndex)"
-        :class="[
-          'weight',
-          attribute.isActive ? 'seletedSpecifications' : '',
-          attribute.isDisabled ? 'disabledStyle' : '',
-        ]"
+        class="weight"
+        :class="{ seletedSpecifications: attribute.isActive, disabledStyle: attribute.isDisabled }"
       >
         <div>{{ attribute.value }}</div>
       </div>
@@ -38,7 +18,6 @@ npm install ym-sku
 <script lang="ts" setup>
 import { useSku } from "ym-sku";
 
-// data.ts
 const properties = [
   {
     name: "Size",
@@ -137,27 +116,3 @@ const [dataSource, handleClickAttribute] = useSku(props);
   border: 2px solid #fb6e23;
 }
 </style>
-```
-
-### 其中返回的 dataSource 说明
-
-```js
-const dataSource = {
-  properties: [], // property 列表
-  skuList: [], // sku 列表
-  selected: [], // 当前已选的 attribute 列表
-  skuId: "", // skuList组合中当前选中的的skuId,可以设置默认skuid(默认选中状态)
-};
-```
-
-### 自定义
-
-```ts
-import { useSku, init, getUnchooseLabel } from "@/ym-sku/index";
-const test = () => {
-  // 手动控制属性，这里是更改了选中的sku, 你也可以修改 properties 或 skuList，
-  init({ properties, skuList, defaultSkuId: skuList[1].id });
-  // 获取未选择标签
-  console.log(getUnchooseLabel());
-};
-```

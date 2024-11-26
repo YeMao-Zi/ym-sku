@@ -21,7 +21,7 @@ export type InitialValue = {
   skuId?: string;
 };
 
-export type DataSource = {
+export interface DataSource {
   properties: Properties;
   selected: string[];
   unDisabled: number[];
@@ -29,4 +29,4 @@ export type DataSource = {
   valueInLabel: ValueInLabel;
   vertexList: string[];
   skuId: string;
-};
+}

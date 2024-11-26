@@ -3,14 +3,37 @@
   "description": "基于 vue3 + ts + hooks 的响应式 sku 数据处理插件, 为了样式的可定制化,只处理 sku 数据,UI 可自己随意绘制",
   "version": "1.0.5",
   "private": false,
+  "exports": {
+    ".": {
+      "require": {
+        "node": "./dist/index.js",
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "import": {
+        "node": "./dist/index.mjs",
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
+      }
+    },
+    "./*": "./*",
+    "./dist/*": "./dist/*"
+  },
   "main": "dist/index.js",
+  "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
   "author": {
     "name": "zhushengjie"
   },
+  "files": [
+    "dist/**/*"
+  ],
   "scripts": {
-    "build": "tsc",
-    "test": "jest --config jestconfig.json"
+    "dev": "vite --config ./playground/vite.config.ts ./playground",
+    "build": "tsup",
+    "test": "jest --config jestconfig.json",
+    "publishing": "release-it",
+    "release": "yarn build && yarn publishing"
   },
   "repository": {
     "type": "git",
@@ -18,18 +41,30 @@
   },
   "keywords": [
     "sku",
-    "vue3"
+    "vue3",
+    "hooks"
   ],
   "devDependencies": {
-    "@types/jest": "^29.5.3",
+    "@types/jest": "^29.5.0",
     "jest": "^29.6.1",
     "ts-jest": "^29.1.1",
-    "typescript": "^5.1.6"
+    "typescript": "^5.1.6",
+    "release-it": "^17.10.0",
+    "@release-it/conventional-changelog": "^9.0.0",
+    "@vitejs/plugin-vue": "^4.3.4",
+    "tsup": "^8.0.2",
+    "vite": "^4.2.0",
+    "vue": "^3.2.47",
+    "@swc/core": "^1.4.12"
   },
-  "dependencies": {
-    "vue": "^3.3.4"
+  "peerDependencies": {
+    "vue": "^3.2.47"
   },
-  "files": [
-    "dist/**/*"
-  ]
+  "engines": {
+    "node": ">=16"
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/",
+    "access": "public"
+  }
 }

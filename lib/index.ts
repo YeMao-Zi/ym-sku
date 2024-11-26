@@ -45,19 +45,18 @@ const init = ({ properties, skuList, skuId }: InitialValue) => {
   });
 
   // 筛选可选的 SKU
-  const _skuList = skuList.map((item) => {
+  skuList.forEach((item) => {
     Reflect.set(
       item,
       "skuPrime",
       item.attributes.map((ii) => valueInLabel[ii])
     );
-    return item;
   });
 
   // 初始化规格展示内容
   pathFinder = new PathFinder(
     way,
-    _skuList.map((item) => item?.skuPrime ?? 0)
+    skuList.map((item) => item?.skuPrime ?? 0)
   );
 
   // 获取不可选规格内容
@@ -75,7 +74,6 @@ const init = ({ properties, skuList, skuId }: InitialValue) => {
   dataSource.valueInLabel = valueInLabel;
   dataSource.skuList = skuList;
 
-  //   console.log(dataSource);
   skuId && selectedAttrsBySkuId(skuId);
 };
 
@@ -90,27 +88,30 @@ const handleClickAttribute = (propertyIndex: number, attributeIndex: number) => 
   // 获取已经有的矩阵值
   const light = pathFinder.light;
   // 如果未选中则提供选中，如果选中移除
-  if (index > -1) {
-    pathFinder.remove(prime);
-    selected.splice(index, 1);
-  } else if (light[propertyIndex].includes(2)) {
-    // 如果同规格中，有选中，则先移除选中，
-    // 获取需要移除的同行规格
-    const removeType = properties[propertyIndex]["attributes"].map((item) => item.value)[
-      light[propertyIndex].indexOf(2)
-    ];
-    // 获取需要提出的同行规格质数
-    const removePrime = Reflect.get(valueInLabel, removeType);
-    // 移除
-    pathFinder.remove(removePrime);
-    selected.splice(selected.indexOf(removeType), 1);
-    //移除同行后，添加当前选择规格
-    pathFinder.add(prime);
-    selected.push(type);
-  } else {
-    pathFinder.add(prime);
-    selected.push(type);
-  }
+  try {
+    if (index > -1) {
+      pathFinder.remove(prime);
+      selected.splice(index, 1);
+    } else if (light[propertyIndex].includes(2)) {
+      // 如果同规格中，有选中，则先移除选中，
+      // 获取需要移除的同行规格
+      const removeType = properties[propertyIndex]["attributes"].map((item) => item.value)[
+        light[propertyIndex].indexOf(2)
+      ];
+      // 获取需要提出的同行规格质数
+      const removePrime = Reflect.get(valueInLabel, removeType);
+      // 移除
+      pathFinder.remove(removePrime);
+      selected.splice(selected.indexOf(removeType), 1);
+      //移除同行后，添加当前选择规格
+      pathFinder.add(prime);
+      selected.push(type);
+    } else {
+      pathFinder.add(prime);
+      selected.push(type);
+    }
+  } catch (error) {}
+
   dataSource.selected = selected;
   // 更新不可选规格
   dataSource.unDisabled = pathFinder.getWay().flat();
@@ -131,7 +132,6 @@ const handleClickAttribute = (propertyIndex: number, attributeIndex: number) => 
   } else {
     dataSource.skuId = "";
   }
-  console.log(dataSource);
 };
 
 const selectedAttrsBySkuId = (skuId: string) => {
@@ -169,7 +169,7 @@ const getUnchooseLabel = () => {
   return unChooseLabel;
 };
 
-const myUseSkuState = (
+const useSku = (
   initialValue: InitialValue
 ): [
   Pick<DataSource, "properties" | "properties" | "selected" | "skuId">,
@@ -182,4 +182,4 @@ const myUseSkuState = (
   return [data.value, handleClickAttribute];
 };
 
-export { init, selectedAttrsBySkuId, getUnchooseLabel, myUseSkuState };
+export { init, selectedAttrsBySkuId, getUnchooseLabel, useSku };
