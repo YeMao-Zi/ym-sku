@@ -1,7 +1,7 @@
 import { computed, reactive } from "vue";
 import type { Ref } from "vue";
 import { getPrime, PathFinder, arrayEqual } from "./skuUtil";
-import { InitialValue, DataSource } from "./type";
+import { InitialValue, DataSource, Attributes, ReturnData } from "./type";
 
 const dataSource = reactive<DataSource>({
   // 规格
@@ -11,88 +11,28 @@ const dataSource = reactive<DataSource>({
   skuList: [], // 可用sku
   valueInLabel: {}, // 质数，规格枚举值
   vertexList: [],
+  sku: undefined,
   skuId: "",
 });
 
 const data = computed(() => {
-  const sku = dataSource.skuList.find((i) => i.id === dataSource.skuId);
   return {
     properties: dataSource.properties,
     skuList: dataSource.skuList,
     selected: dataSource.selected,
     skuId: dataSource.skuId,
-    sku: sku,
+    sku: dataSource.sku,
   };
 });
 
 let pathFinder: PathFinder;
 
-const init = (options: Partial<InitialValue>) => {
-  const {
-    properties = dataSource.properties,
-    skuList = dataSource.skuList,
-    skuId = dataSource.skuId,
-  } = options;
-  // 抹平规格内容
-  properties.forEach((prop) => {
-    prop.attributes.forEach((attr) => {
-      dataSource.vertexList.push(attr.value);
-    });
-  });
-  // 通过抹平规格，获取规格对应质数
-  const prime = getPrime(dataSource.vertexList.length);
-  // 质数对应规格数 枚举值处理
-  const valueInLabel: Record<string, number> = {};
-  dataSource.vertexList.forEach((item, index) => {
-    valueInLabel[item] = prime[index];
-  });
-
-  // 根据规格坐标，排序质数坐标
-  const way = properties.map((i) => {
-    return i.attributes.map((ii) => valueInLabel[ii.value]);
-  });
-
-  // 筛选可选的 SKU
-  skuList.forEach((item) => {
-    Reflect.set(
-      item,
-      "skuPrime",
-      item.attributes.map((ii) => valueInLabel[ii])
-    );
-  });
-
-  // 初始化规格展示内容
-  pathFinder = new PathFinder(
-    way,
-    skuList.map((item) => item?.skuPrime ?? 0)
-  );
-
-  // 获取不可选规格内容
-  const unDisabled = pathFinder.getWay().flat();
-
-  const _properties = properties.map((item) => {
-    item.attributes.forEach((attribute) => {
-      attribute.isDisabled = !unDisabled.includes(valueInLabel[attribute.value]);
-    });
-    return item;
-  });
-
-  dataSource.properties = _properties;
-  dataSource.unDisabled = unDisabled;
-  dataSource.valueInLabel = valueInLabel;
-  dataSource.skuList = skuList;
-
-  if (skuId) {
-    dataSource.skuId = skuId;
-    selectedAttrsBySkuId(skuId);
-  }
-};
-
-const handleClickAttribute = (propertyIndex: number, attributeIndex: number) => {
+const handleClickAttribute = (propertyIndex: number, attributeIndex: number): Attributes => {
   // 获取已经选中的规格,质数，规格枚举值,以及原本规格名称
   const { selected, valueInLabel, properties, skuList } = dataSource;
   // 检查此次选择是否在已选内容中
   const attribute = properties[propertyIndex]["attributes"][attributeIndex];
+  if (attribute.isDisabled) return attribute;
   const type = attribute.value;
   const prime = Reflect.get(valueInLabel, type);
   const index = selected.indexOf(type);
@@ -140,9 +80,93 @@ const handleClickAttribute = (propertyIndex: number, attributeIndex: number) => 
   const sku = skuList.find((item) => arrayEqual(item.attributes, dataSource.selected));
   if (sku) {
     dataSource.skuId = sku.id;
+    dataSource.sku = sku;
   } else {
     dataSource.skuId = "";
+    dataSource.sku = undefined;
   }
+  return attribute;
+};
+
+const setOptions = (options: Partial<InitialValue>) => {
+  const {
+    properties = dataSource.properties,
+    skuList = dataSource.skuList,
+    skuId = dataSource.skuId,
+  } = options;
+  // 抹平规格内容
+  properties.forEach((prop) => {
+    prop.attributes.forEach((attr) => {
+      dataSource.vertexList.push(attr.value);
+    });
+  });
+  // 通过抹平规格，获取规格对应质数
+  const prime = getPrime(dataSource.vertexList.length);
+  // 质数对应规格数 枚举值处理
+  const valueInLabel: Record<string, number> = {};
+  dataSource.vertexList.forEach((item, index) => {
+    valueInLabel[item] = prime[index];
+  });
+
+  // 根据规格坐标，排序质数坐标
+  const way = properties.map((i) => {
+    return i.attributes.map((ii) => valueInLabel[ii.value]);
+  });
+
+  // 筛选可选的 SKU
+  skuList.forEach((item) => {
+    Reflect.set(
+      item,
+      "skuPrime",
+      item.attributes.map((ii) => valueInLabel[ii])
+    );
+  });
+
+  // 初始化规格展示内容
+  pathFinder = new PathFinder(
+    way,
+    skuList.map((item) => item?.skuPrime ?? 0)
+  );
+
+  // 获取不可选规格内容
+  let unDisabled = pathFinder.getWay().flat();
+
+  const _properties = properties.map((item, propertyIndex) => {
+    item.attributes.forEach((attribute, attributeIndex) => {
+      const prime = Reflect.get(valueInLabel, attribute.value);
+      try {
+        if (attribute.isActive) {
+          pathFinder.add(prime);
+          dataSource.selected.push(attribute.value);
+        }
+      } catch (error) {
+        attribute.isActive = false;
+        console.error(`selcted attribute conflict: ${attribute.value}`);
+      }
+      // 获取不可选规格内容
+      unDisabled = pathFinder.getWay().flat();
+      attribute.isDisabled = !unDisabled.includes(valueInLabel[attribute.value]);
+    });
+    return item;
+  });
+
+  dataSource.properties = _properties;
+  dataSource.unDisabled = unDisabled;
+  dataSource.valueInLabel = valueInLabel;
+  dataSource.skuList = skuList;
+
+  if (skuId) {
+    dataSource.skuId = skuId;
+    selectedAttrsBySkuId(skuId);
+  }
+
+  // _properties.forEach((item, propertyIndex) => {
+  //   item.attributes.forEach((attribute, attributeIndex) => {
+  //     if (attribute.isActive) {
+  //       handleClickAttribute(propertyIndex, attributeIndex);
+  //     }
+  //   });
+  // });
 };
 
 const selectedAttrsBySkuId = (skuId: string) => {
@@ -167,8 +191,8 @@ const selectedAttrsBySkuId = (skuId: string) => {
 };
 
 // 获取未选中标签
-const getUnchooseLabel = () => {
-  const unChooseLabel: string[] = [];
+const unselectedName = () => {
+  const names: string[] = [];
   dataSource.properties.forEach((prop) => {
     const hasLabel = prop.attributes.some((attr) => {
       return attr.isActive === true;
@@ -178,27 +202,24 @@ const getUnchooseLabel = () => {
         const selectedSort = dataSource.selected.slice().sort();
         const skuAttrbutesSort = data.value.sku.attributes.slice().sort();
         if (JSON.stringify(selectedSort) !== JSON.stringify(skuAttrbutesSort)) {
-          unChooseLabel.push(prop.name);
+          names.push(prop.name);
         }
       } else {
-        unChooseLabel.push(prop.name);
+        names.push(prop.name);
       }
     }
   });
-  return unChooseLabel;
+  return names;
 };
 
 const useSku = (
   initialValue: InitialValue
-): [
-  Ref<Pick<DataSource, "properties" | "properties" | "selected" | "skuId">>,
-  (propertyIndex: number, attributeIndex: number) => void
-] => {
+): [Ref<ReturnData>, (propertyIndex: number, attributeIndex: number) => Attributes] => {
   if (dataSource.properties.length === 0) {
-    init(initialValue);
+    setOptions(initialValue);
   }
 
   return [data, handleClickAttribute];
 };
 
-export { init, selectedAttrsBySkuId, getUnchooseLabel, useSku };
+export { setOptions, unselectedName, useSku };

@@ -1,19 +1,21 @@
+export interface Attributes {
+  value: string;
+  isActive?: boolean;
+  isDisabled?: boolean;
+  [k: string]: any;
+}
+
 export type Properties = {
   name: string;
-  attributes: {
-    value: string;
-    isActive?: boolean;
-    isDisabled?: boolean;
-    [k: string]: any;
-  }[];
+  attributes: Attributes[];
 }[];
 
-export type Sku = {
+export interface Sku {
   id: string;
   attributes: string[];
   skuPrime?: number;
   [k: string]: any;
-};
+}
 
 export type SkuList = Sku[];
 
@@ -33,4 +35,13 @@ export interface DataSource {
   valueInLabel: ValueInLabel;
   vertexList: string[];
   skuId: string;
+  sku?: Sku;
+}
+
+export interface ReturnData {
+  skuList: SkuList;
+  properties: Properties;
+  selected: string[];
+  skuId?: string;
+  sku?: Sku;
 }

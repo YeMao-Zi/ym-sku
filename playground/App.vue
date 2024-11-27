@@ -1,29 +1,35 @@
 <template>
-  <div v-for="(item, propertyIndex) in dataSource.properties" :key="propertyIndex">
-    <div>{{ item.name }}</div>
-    <div class="attrbute">
-      <div
-        v-for="(attribute, attributeIndex) in item.attributes"
-        :key="attributeIndex"
-        @click="handleClickAttribute(propertyIndex, attributeIndex)"
-        class="weight"
-        :class="{ seletedSpecifications: attribute.isActive, disabledStyle: attribute.isDisabled }"
-      >
-        <div>{{ attribute?.label || attribute.value }}</div>
+  <div>
+    <div v-for="(item, propertyIndex) in dataSource.properties" :key="propertyIndex">
+      <div>{{ item.name }}</div>
+      <div class="attrbute">
+        <div
+          v-for="(attribute, attributeIndex) in item.attributes"
+          :key="attributeIndex"
+          @click="handleClick(propertyIndex, attributeIndex)"
+          class="weight"
+          :class="{
+            seletedSpecifications: attribute.isActive,
+            disabledStyle: attribute.isDisabled,
+          }"
+        >
+          <div>{{ attribute?.label || attribute.value }}</div>
+        </div>
       </div>
     </div>
+    <p>price:{{ dataSource.sku?.price }}</p>
+    <button @click="testFn">test</button>
   </div>
-  <button @click="getSkuInfo">getSkuInfo</button>
 </template>
 
 <script lang="ts" setup>
-import { useSku, getUnchooseLabel, init } from "ym-sku";
+import { useSku, unselectedName, setOptions } from "ym-sku";
 
 const properties = [
   {
     name: "Size",
     attributes: [
-      { label: "S", value: "S", isActive: true },
+      { label: "S", value: "S", isActive: true }, // 默认选中
       { label: "S", value: "M" },
       { label: "L", value: "L" },
       { label: "Y", value: "Y" },
@@ -32,13 +38,13 @@ const properties = [
   },
   {
     name: "Color",
-    attributes: [{ value: "red" }, { value: "green" }],
+    attributes: [{ value: "red", isActive: true }, { value: "green" }],
   },
   {
     name: "Figure ",
     attributes: [
-      { label: "", value: "stripe" },
-      { label: "", value: "wave" },
+      { label: "stripe", value: "stripe" },
+      { label: "wave", value: "wave", isActive: true }, // 和 skuId:10（["S", "red", "stripe"]） 冲突，会抛出错误且不会被选中
     ],
   },
 ];
@@ -48,43 +54,49 @@ const skuList = [
     id: "10",
     attributes: ["S", "red", "stripe"],
     stock: 12,
-    price: 100,
-    originalPrice: 150,
+    price: 10,
+    originalPrice: 100,
   },
   {
     id: "20",
     attributes: ["S", "green", "wave"],
     stock: 30,
-    price: 100,
-    originalPrice: 110,
+    price: 20,
+    originalPrice: 100,
   },
   {
     id: "30",
     attributes: ["M", "red", "stripe"],
     stock: 20,
-    price: 100,
-    originalPrice: 130,
+    price: 30,
+    originalPrice: 100,
   },
   {
     id: "40",
     attributes: ["L", "red"],
     stock: 15,
-    price: 100,
-    originalPrice: 120,
+    price: 40,
+    originalPrice: 100,
   },
 ];
 
 const props = {
   properties,
   skuList,
-  // skuId: "40",
+  // skuId: "40", // select skuId:40
 };
 
 const [dataSource, handleClickAttribute] = useSku(props);
 
-const getSkuInfo = () => {
-  console.log(dataSource, getUnchooseLabel());
-  // init({ skuId: "40" });
+const handleClick = (propertyIndex: number, attributeIndex: number) => {
+  const attrbute = handleClickAttribute(propertyIndex, attributeIndex);
+  console.log(attrbute);
+};
+
+const testFn = () => {
+  console.log(dataSource, unselectedName());
+  // select skuId:40
+  // setOptions({ skuId: "40" });
 };
 </script>
 
