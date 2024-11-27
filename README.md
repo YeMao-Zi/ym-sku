@@ -16,7 +16,7 @@ npm install ym-sku
 
 ![image-20241127152925671](https://s2.loli.net/2024/11/27/kICSYJcGjTPHBeu.png)
 
-[example](https://codepen.io/zhushengjie123/pen/ByBBbpw)
+[example](https://codesandbox.io/p/devbox/ym-sku-r8xkxm)
 
 ## 使用
 
@@ -155,8 +155,6 @@ const testFn = () => {
   border: 2px solid #fb6e23;
 }
 </style>
-
-
 ```
 
 ### 其中返回的 dataSource 签名
@@ -165,35 +163,30 @@ const testFn = () => {
 const dataSource: ComputedRef<{
   // property 列表
     properties: {
-        name: string;
+        name: any;
         attributes: {
-            [x: string]: any;
-            value: string;
+            value: any;
             isActive?: boolean;
             isDisabled?: boolean;
         }[];
     }[];
     // sku列表
     skuList: {
-        [x: string]: any;
-        id: string;
-        attributes: string[];
-        skuPrime?: number;
+        id: any;
+        attributes: any[];
     }[];
-    selected: string[];
+    selected: any[];
     // 当前选中的skuId
-    skuId?: string;
+    skuId?: any;
     // 当前选中的sku
     sku?: {
-        [x: string]: any;
-        id: string;
-        attributes: string[];
-        skuPrime?: number;
+        id: any;
+        attributes: any[];
     };
 }>
 ```
 
-### 自定义
+### 其他
 
 ```ts
 import { useSku, setOptions, unselectedName } from "@/ym-sku/index";
