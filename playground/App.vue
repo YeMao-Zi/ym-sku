@@ -103,13 +103,13 @@ const getSkuInfo = () => {
   justify-content: center;
   padding: 5px 20px;
   text-align: center;
-  margin: 10rpx 0;
+  margin: 10px 0;
   background: #ffffff;
-  border-radius: 10rpx;
+  border-radius: 10px;
   border: 2px solid #a6a6a6;
   font-size: 14px;
   color: rgba(0, 0, 0, 0.85);
-  margin-right: 20rpx;
+  margin-right: 10px;
 }
 
 .disabledStyle {
