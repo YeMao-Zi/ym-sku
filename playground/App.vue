@@ -51,7 +51,7 @@ const properties = [
 
 const skuList = [
   {
-    id: "10",
+    id: 10,
     attributes: ["S", "red", "stripe"],
     stock: 12,
     price: 10,

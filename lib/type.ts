@@ -1,5 +1,5 @@
 export interface Attributes {
-  value: string;
+  value: any;
   isActive?: boolean;
   isDisabled?: boolean;
   [k: string]: any;
@@ -11,9 +11,9 @@ export type Properties = {
 }[];
 
 export interface Sku {
-  id: string;
-  attributes: string[];
-  skuPrime?: number;
+  id: any;
+  attributes: any[];
+  skuPrime?: number[];
   [k: string]: any;
 }
 
@@ -24,24 +24,24 @@ export type ValueInLabel = Record<string, number>;
 export type InitialValue = {
   properties: Properties;
   skuList: SkuList;
-  skuId?: string;
+  skuId?: any;
 };
 
 export interface DataSource {
   properties: Properties;
-  selected: string[];
+  selected: any[];
   unDisabled: number[];
   skuList: SkuList;
   valueInLabel: ValueInLabel;
-  vertexList: string[];
-  skuId: string;
+  vertexList: any[];
+  skuId: any;
   sku?: Sku;
 }
 
 export interface ReturnData {
   skuList: SkuList;
   properties: Properties;
-  selected: string[];
-  skuId?: string;
+  selected: any[];
+  skuId?: any;
   sku?: Sku;
 }
