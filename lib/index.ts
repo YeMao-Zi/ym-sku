@@ -1,4 +1,5 @@
 import { computed, reactive } from "vue";
+import type { Ref } from "vue";
 import { getPrime, PathFinder, arrayEqual } from "./skuUtil";
 import { InitialValue, DataSource } from "./type";
 
@@ -14,17 +15,24 @@ const dataSource = reactive<DataSource>({
 });
 
 const data = computed(() => {
+  const sku = dataSource.skuList.find((i) => i.id === dataSource.skuId);
   return {
     properties: dataSource.properties,
     skuList: dataSource.skuList,
     selected: dataSource.selected,
     skuId: dataSource.skuId,
+    sku: sku,
   };
 });
 
 let pathFinder: PathFinder;
 
-const init = ({ properties, skuList, skuId }: InitialValue) => {
+const init = (options: Partial<InitialValue>) => {
+  const {
+    properties = dataSource.properties,
+    skuList = dataSource.skuList,
+    skuId = dataSource.skuId,
+  } = options;
   // 抹平规格内容
   properties.forEach((prop) => {
     prop.attributes.forEach((attr) => {
@@ -74,7 +82,10 @@ const init = ({ properties, skuList, skuId }: InitialValue) => {
   dataSource.valueInLabel = valueInLabel;
   dataSource.skuList = skuList;
 
-  skuId && selectedAttrsBySkuId(skuId);
+  if (skuId) {
+    dataSource.skuId = skuId;
+    selectedAttrsBySkuId(skuId);
+  }
 };
 
 const handleClickAttribute = (propertyIndex: number, attributeIndex: number) => {
@@ -163,7 +174,15 @@ const getUnchooseLabel = () => {
       return attr.isActive === true;
     });
     if (!hasLabel) {
-      unChooseLabel.push(prop.name);
+      if (data.value.skuId) {
+        const selectedSort = dataSource.selected.slice().sort();
+        const skuAttrbutesSort = data.value.sku.attributes.slice().sort();
+        if (JSON.stringify(selectedSort) !== JSON.stringify(skuAttrbutesSort)) {
+          unChooseLabel.push(prop.name);
+        }
+      } else {
+        unChooseLabel.push(prop.name);
+      }
     }
   });
   return unChooseLabel;
@@ -172,14 +191,14 @@ const getUnchooseLabel = () => {
 const useSku = (
   initialValue: InitialValue
 ): [
-  Pick<DataSource, "properties" | "properties" | "selected" | "skuId">,
+  Ref<Pick<DataSource, "properties" | "properties" | "selected" | "skuId">>,
   (propertyIndex: number, attributeIndex: number) => void
 ] => {
   if (dataSource.properties.length === 0) {
     init(initialValue);
   }
 
-  return [data.value, handleClickAttribute];
+  return [data, handleClickAttribute];
 };
 
 export { init, selectedAttrsBySkuId, getUnchooseLabel, useSku };

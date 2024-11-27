@@ -13,34 +13,32 @@
       </div>
     </div>
   </div>
+  <button @click="getSkuInfo">getSkuInfo</button>
 </template>
 
 <script lang="ts" setup>
-import { useSku } from "ym-sku";
+import { useSku, getUnchooseLabel, init } from "ym-sku";
 
 const properties = [
   {
     name: "Size",
     attributes: [
-      { label: "S", value: "S", isActive: false, isDisabled: false },
-      { label: "S", value: "M", isActive: false, isDisabled: false },
-      { label: "L", value: "L", isActive: false, isDisabled: false },
-      { label: "Y", value: "Y", isActive: false, isDisabled: false },
-      { label: "B", value: "B", isActive: false, isDisabled: false },
+      { label: "S", value: "S", isActive: true },
+      { label: "S", value: "M" },
+      { label: "L", value: "L" },
+      { label: "Y", value: "Y" },
+      { label: "B", value: "B" },
     ],
   },
   {
     name: "Color",
-    attributes: [
-      { value: "red", isActive: false, isDisabled: false },
-      { value: "green", isActive: false, isDisabled: false },
-    ],
+    attributes: [{ value: "red" }, { value: "green" }],
   },
   {
     name: "Figure ",
     attributes: [
-      { label: "", value: "stripe", isActive: false, isDisabled: false },
-      { label: "", value: "wave", isActive: false, isDisabled: false },
+      { label: "", value: "stripe" },
+      { label: "", value: "wave" },
     ],
   },
 ];
@@ -69,7 +67,7 @@ const skuList = [
   },
   {
     id: "40",
-    attributes: ["L", "red", "wave"],
+    attributes: ["L", "red"],
     stock: 15,
     price: 100,
     originalPrice: 120,
@@ -79,9 +77,15 @@ const skuList = [
 const props = {
   properties,
   skuList,
+  // skuId: "40",
 };
 
 const [dataSource, handleClickAttribute] = useSku(props);
+
+const getSkuInfo = () => {
+  console.log(dataSource, getUnchooseLabel());
+  // init({ skuId: "40" });
+};
 </script>
 
 <style scoped>

@@ -42,25 +42,22 @@ const properties = [
   {
     name: "Size",
     attributes: [
-      { label: "S", value: "S", isActive: false, isDisabled: false },
-      { label: "S", value: "M", isActive: false, isDisabled: false },
-      { label: "L", value: "L", isActive: false, isDisabled: false },
-      { label: "Y", value: "Y", isActive: false, isDisabled: false },
-      { label: "B", value: "B", isActive: false, isDisabled: false },
+      { label: "S", value: "S", isActive: true }, // 可以定义默认标签的选中状态
+      { label: "S", value: "M" },
+      { label: "L", value: "L" },
+      { label: "Y", value: "Y" },
+      { label: "B", value: "B" },
     ],
   },
   {
     name: "Color",
-    attributes: [
-      { value: "red", isActive: false, isDisabled: false },
-      { value: "green", isActive: false, isDisabled: false },
-    ],
+    attributes: [{ value: "red" }, { value: "green" }],
   },
   {
     name: "Figure ",
     attributes: [
-      { label: "", value: "stripe", isActive: false, isDisabled: false },
-      { label: "", value: "wave", isActive: false, isDisabled: false },
+      { label: "", value: "stripe" },
+      { label: "", value: "wave" },
     ],
   },
 ];
@@ -89,7 +86,7 @@ const skuList = [
   },
   {
     id: "40",
-    attributes: ["L", "red", "wave"],
+    attributes: ["L", "red"],
     stock: 15,
     price: 100,
     originalPrice: 120,
@@ -138,22 +135,45 @@ const [dataSource, handleClickAttribute] = useSku(props);
 </style>
 ```
 
-### 其中返回的 dataSource 说明
+### 其中返回的 dataSource 签名
 
 ```js
-const dataSource = {
-  properties: [], // property 列表
-  skuList: [], // sku 列表
-  selected: [], // 当前已选的 attribute 列表
-  skuId: "", // skuList组合中当前选中的的skuId,可以设置默认skuid(默认选中状态)
-};
+const dataSource: ComputedRef<{
+  // property 列表
+    properties: {
+        name: string;
+        attributes: {
+            [x: string]: any;
+            value: string;
+            isActive?: boolean;
+            isDisabled?: boolean;
+        }[];
+    }[];
+    // sku列表
+    skuList: {
+        [x: string]: any;
+        id: string;
+        attributes: string[];
+        skuPrime?: number;
+    }[];
+    selected: string[];
+    // 当前选中的skuId
+    skuId: string;
+    // 当前选中的sku
+    sku: {
+        [x: string]: any;
+        id: string;
+        attributes: string[];
+        skuPrime?: number;
+    };
+}>
 ```
 
 ### 自定义
 
 ```ts
 import { useSku, init, getUnchooseLabel } from "@/ym-sku/index";
-const test = () => {
+const handleClick = () => {
   // 手动控制属性，这里是更改了选中的sku, 你也可以修改 properties 或 skuList，
   init({ properties, skuList, defaultSkuId: skuList[1].id });
   // 获取未选择标签
