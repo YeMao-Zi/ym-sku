@@ -1,5 +1,15 @@
 
 
+## [1.1.3](https://github.com/YeMao-Zi/ym-sku/compare/1.1.2...1.1.3) (2024-11-27)
+
+### 🐛 Bug Fixes | Bug 修复
+
+* default selected skuId not return sku ([a5cd2ab](https://github.com/YeMao-Zi/ym-sku/commit/a5cd2ab0a93fe4e1442f934f832e99569ce258d6))
+
+### ✅ Tests | 测试
+
+* unselectedName ([dcaf8aa](https://github.com/YeMao-Zi/ym-sku/commit/dcaf8aa1c012ebaf0d6597ec72f5fa6c2574bdeb))
+
 ## [1.1.2](https://github.com/YeMao-Zi/ym-sku/compare/1.1.1...1.1.2) (2024-11-27)
 
 ### ✨ Features | 新功能
