@@ -14,12 +14,7 @@ npm install ym-sku
 
 ## 示例
 
-<p class="codepen" data-height="305" data-default-tab="html,result" data-slug-hash="ByBBbpw" data-pen-title="Vue3 setup" data-user="zhushengjie123" style="height: 305px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 2px solid; margin: 1em 0; padding: 1em;">
-  <span>See the Pen <a href="https://codepen.io/zhushengjie123/pen/ByBBbpw">
-  Vue3 setup</a> by Dark Cat (<a href="https://codepen.io/zhushengjie123">@zhushengjie123</a>)
-  on <a href="https://codepen.io">CodePen</a>.</span>
-</p>
-<script async src="https://cpwebassets.codepen.io/assets/embed/ei.js"></script>
+[example](https://codepen.io/zhushengjie123/pen/ByBBbpw)
 
 ## 使用
 
