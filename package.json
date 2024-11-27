@@ -33,7 +33,7 @@
     "build": "tsup",
     "test": "jest --config jestconfig.json",
     "publishing": "release-it",
-    "release": "yarn build && yarn publishing"
+    "release": "npm run build && npm run publishing"
   },
   "repository": {
     "type": "git",
