@@ -1,5 +1,11 @@
 
 
+## [1.1.1](https://github.com/YeMao-Zi/ym-sku/compare/1.1.0...1.1.1) (2024-11-27)
+
+### 📝 Documentation | 文档
+
+* type放开限制 ([b1134f6](https://github.com/YeMao-Zi/ym-sku/commit/b1134f649d0be296cc2523c6edba5fd0a48c1d1e))
+
 ## 1.1.0 (2024-11-26)
 
 ### 📝 Documentation | 文档
