@@ -14,6 +14,8 @@ npm install ym-sku
 
 ## 示例
 
+![image-20241127152925671](https://s2.loli.net/2024/11/27/kICSYJcGjTPHBeu.png)
+
 [example](https://codepen.io/zhushengjie123/pen/ByBBbpw)
 
 ## 使用

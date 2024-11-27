@@ -159,26 +159,15 @@ const setOptions = (options: Partial<InitialValue>) => {
     dataSource.skuId = skuId;
     selectedAttrsBySkuId(skuId);
   }
-
-  // _properties.forEach((item, propertyIndex) => {
-  //   item.attributes.forEach((attribute, attributeIndex) => {
-  //     if (attribute.isActive) {
-  //       handleClickAttribute(propertyIndex, attributeIndex);
-  //     }
-  //   });
-  // });
 };
 
 const selectedAttrsBySkuId = (skuId: string) => {
   const { properties, valueInLabel } = dataSource;
   const sku = dataSource.skuList.find((item) => item.id === skuId);
-
+  dataSource.sku = sku;
   dataSource.selected = sku?.attributes ?? [];
-
   dataSource.selected.forEach((item) => pathFinder.add(valueInLabel[item]));
-
   dataSource.unDisabled = pathFinder.getWay().flat();
-
   dataSource.properties = properties.map((item) => {
     item.attributes.forEach((attribute) => {
       attribute.isDisabled = !dataSource.unDisabled.includes(
