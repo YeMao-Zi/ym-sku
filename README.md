@@ -67,7 +67,7 @@ const properties = [
     name: "Figure ",
     attributes: [
       { label: "stripe", value: "stripe" },
-      { label: "wave", value: "wave", isActive: true }, // 和 skuId:10（["S", "red", "stripe"]） 冲突，会抛出错误且不会被选中
+      { label: "wave", value: "wave", isActive: true }, // 不存在 sku:["S","red","wave"]，会抛出错误且不会被选中
     ],
   },
 ];
@@ -122,8 +122,6 @@ const testFn = () => {
   if (names.length) {
     alert(`please select ${names.join(",")}`);
   }
-  // select skuId:40
-  // setOptions({ skuId: "40" });
 };
 </script>
 
@@ -159,7 +157,6 @@ const testFn = () => {
   border: 2px solid #fb6e23;
 }
 </style>
-
 ```
 
 ### 其中返回的 dataSource 签名
