@@ -74,7 +74,7 @@ const properties = [
 
 const skuList = [
   {
-    id: "10",
+    id: 10,
     attributes: ["S", "red", "stripe"],
     stock: 12,
     price: 10,
@@ -117,7 +117,11 @@ const handleClick = (propertyIndex: number, attributeIndex: number) => {
 };
 
 const testFn = () => {
-  console.log(dataSource, unselectedName());
+  const names = unselectedName();
+  console.log(dataSource, names);
+  if (names.length) {
+    alert(`please select ${names.join(",")}`);
+  }
   // select skuId:40
   // setOptions({ skuId: "40" });
 };
@@ -155,6 +159,7 @@ const testFn = () => {
   border: 2px solid #fb6e23;
 }
 </style>
+
 ```
 
 ### 其中返回的 dataSource 签名
@@ -175,10 +180,11 @@ const dataSource: ComputedRef<{
         id: any;
         attributes: any[];
     }[];
+    // 当前选中的所有 attribute
     selected: any[];
-    // 当前选中的skuId
+    // 当前选中的 skuId
     skuId?: any;
-    // 当前选中的sku
+    // 当前选中的 sku
     sku?: {
         id: any;
         attributes: any[];

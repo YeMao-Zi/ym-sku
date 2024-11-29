@@ -61,7 +61,9 @@ const handleClickAttribute = (propertyIndex: number, attributeIndex: number): At
       pathFinder.add(prime);
       selected.push(type);
     }
-  } catch (error) {}
+  } catch (error) {
+    console.error(error);
+  }
 
   dataSource.selected = selected;
   // 更新不可选规格
@@ -113,19 +115,13 @@ const setOptions = (options: Partial<InitialValue>) => {
     return i.attributes.map((ii) => valueInLabel[ii.value]);
   });
 
-  // 筛选可选的 SKU
-  skuList.forEach((item) => {
-    Reflect.set(
-      item,
-      "skuPrime",
-      item.attributes.map((ii) => valueInLabel[ii])
-    );
-  });
-
   // 初始化规格展示内容
   pathFinder = new PathFinder(
     way,
-    skuList.map((item) => item?.skuPrime ?? 0)
+    skuList.map((item) => {
+      // 筛选可选的 SKU
+      return item.attributes.map((ii) => valueInLabel[ii]);
+    })
   );
 
   // 获取不可选规格内容
@@ -204,10 +200,7 @@ const unselectedName = () => {
 const useSku = (
   initialValue: InitialValue
 ): [Ref<ReturnData>, (propertyIndex: number, attributeIndex: number) => Attributes] => {
-  if (dataSource.properties.length === 0) {
-    setOptions(initialValue);
-  }
-
+  setOptions(initialValue);
   return [data, handleClickAttribute];
 };
 

@@ -94,7 +94,11 @@ const handleClick = (propertyIndex: number, attributeIndex: number) => {
 };
 
 const testFn = () => {
-  console.log(dataSource, unselectedName());
+  const names = unselectedName();
+  console.log(dataSource, names);
+  if (names.length) {
+    alert(`please select ${names.join(",")}`);
+  }
   // select skuId:40
   // setOptions({ skuId: "40" });
 };
