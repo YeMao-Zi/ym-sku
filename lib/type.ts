@@ -1,14 +1,14 @@
-export interface Attributes {
+export interface Attribute {
   value: any;
   isActive?: boolean;
   isDisabled?: boolean;
   [k: string]: any;
 }
 
-export type Properties = {
+export type Property = {
   name: string;
-  attributes: Attributes[];
-}[];
+  attributes: Attribute[];
+};
 
 export interface Sku {
   id: any;
@@ -17,31 +17,41 @@ export interface Sku {
   [k: string]: any;
 }
 
-export type SkuList = Sku[];
-
 export type ValueInLabel = Record<string, number>;
 
-export type InitialValue = {
-  properties: Properties;
-  skuList: SkuList;
+export type InitialValue<P, S> = {
+  properties: P[];
+  skuList: S[];
   skuId?: any;
 };
 
 export interface DataSource {
-  properties: Properties;
+  properties: Property[];
   selected: any[];
   unDisabled: number[];
-  skuList: SkuList;
+  skuList: Sku[];
   valueInLabel: ValueInLabel;
   vertexList: any[];
   skuId: any;
   sku?: Sku;
 }
 
-export interface ReturnData {
-  skuList: SkuList;
-  properties: Properties;
+export interface ReturnData<P, S> {
+  skuList: S[];
+  properties: P[];
   selected: any[];
   skuId?: any;
-  sku?: Sku;
+  sku?: S;
 }
+
+export interface Options<P, S> {
+  onChange?: (data: ReturnData<P, S>) => void;
+}
+
+// export type useSku = (
+//   initialValue: InitialValue,
+//   options: Options
+// ) => {
+//   data: ReturnData;
+//   handleClickAttribute: (propertyIndex: number, attributeIndex: number) => Attribute;
+// };

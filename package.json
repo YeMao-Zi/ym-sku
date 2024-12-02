@@ -1,6 +1,6 @@
 {
   "name": "ym-sku",
-  "description": "基于 vue3 + ts + hooks 的响应式 sku 数据处理插件, 为了样式的可定制化,只处理 sku 数据,UI 可自己随意绘制",
+  "description": "sku 数据处理插件, 为了样式的可定制化,只处理 sku 数据,UI 可自己随意绘制",
   "version": "1.1.4",
   "private": false,
   "exports": {
@@ -29,7 +29,7 @@
     "dist/**/*"
   ],
   "scripts": {
-    "dev": "vite --config ./playground/vite.config.ts ./playground",
+    "dev:vue": "vite --config ./playground/vue/vite.config.ts ./playground/vue",
     "build": "tsup",
     "test": "jest --config jestconfig.json",
     "publishing": "release-it",
@@ -41,7 +41,6 @@
   },
   "keywords": [
     "sku",
-    "vue3",
     "hooks"
   ],
   "devDependencies": {
@@ -56,9 +55,6 @@
     "vite": "^4.2.0",
     "vue": "^3.2.47",
     "@swc/core": "^1.4.12"
-  },
-  "peerDependencies": {
-    "vue": "^3.2.47"
   },
   "engines": {
     "node": ">=16"

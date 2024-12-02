@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div v-for="(item, propertyIndex) in dataSource.properties" :key="propertyIndex">
+    <div v-for="(item, propertyIndex) in dataSourse.properties" :key="propertyIndex">
       <div>{{ item.name }}</div>
       <div class="attrbute">
         <div
@@ -10,22 +10,24 @@
           class="weight"
           :class="{
             seletedSpecifications: attribute.isActive,
-            disabledStyle: attribute.isDisabled,
+            disabledStyle: attribute?.isDisabled,
           }"
         >
           <div>{{ attribute?.label || attribute.value }}</div>
         </div>
       </div>
     </div>
-    <p>price:{{ dataSource.sku?.price }}</p>
+    <p>price:{{ dataSourse.sku?.price }}</p>
     <button @click="testFn">test</button>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { useSku, unselectedName, setOptions } from "ym-sku";
+import { Property } from "lib/type";
+import { reactive } from "vue";
+import { useSku } from "ym-sku";
 
-const properties = [
+const properties: Property[] = [
   {
     name: "Size",
     attributes: [
@@ -38,13 +40,13 @@ const properties = [
   },
   {
     name: "Color",
-    attributes: [{ value: "red", isActive: true }, { value: "green" }],
+    attributes: [{ label: "red", value: "red", isActive: true }, { value: "green" }],
   },
   {
     name: "Figure ",
     attributes: [
       { label: "stripe", value: "stripe" },
-      { label: "wave", value: "wave", isActive: true }, // 和 skuId:10（["S", "red", "stripe"]） 冲突，会抛出错误且不会被选中
+      { label: "wave", value: "wave", isActive: true }, // 不存在 sku:["S","red","wave"]，会抛出错误且不会被选中
     ],
   },
 ];
@@ -86,7 +88,23 @@ const props = {
   // skuId: "40", // select skuId:40
 };
 
-const [dataSource, handleClickAttribute] = useSku(props);
+const dataSourse = reactive({
+  properties,
+  skuList,
+  selected: [],
+  sku: undefined,
+});
+
+const { handleClickAttribute, unselectedName } = useSku(props, {
+  onChange(data) {
+    const { properties, skuList, selected, sku } = data;
+    dataSourse.properties = properties;
+    dataSourse.skuList = skuList;
+    dataSourse.selected = selected;
+    dataSourse.sku = sku;
+    console.log(data, "data");
+  },
+});
 
 const handleClick = (propertyIndex: number, attributeIndex: number) => {
   const attrbute = handleClickAttribute(propertyIndex, attributeIndex);
@@ -95,7 +113,6 @@ const handleClick = (propertyIndex: number, attributeIndex: number) => {
 
 const testFn = () => {
   const names = unselectedName();
-  console.log(dataSource, names);
   if (names.length) {
     alert(`please select ${names.join(",")}`);
   }

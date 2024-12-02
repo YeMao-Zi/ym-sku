@@ -5,7 +5,7 @@ import vue from '@vitejs/plugin-vue';
 export default defineConfig({
   resolve: {
     alias: {
-      'ym-sku': path.resolve(__dirname, '../lib/index.ts'),
+      'ym-sku': path.resolve(__dirname, '../../lib/index.ts'),
     },
   },
   plugins: [vue()],
