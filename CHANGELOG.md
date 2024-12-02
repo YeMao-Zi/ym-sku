@@ -1,5 +1,11 @@
 
 
+## [1.1.4](https://github.com/YeMao-Zi/ym-sku/compare/1.1.3...1.1.4) (2024-12-02)
+
+### ⚡ Performance Improvements | 性能优化
+
+* 隐藏skuPrime转内部处理 ([e003ba1](https://github.com/YeMao-Zi/ym-sku/commit/e003ba159094f7aca3f9e6cedf3272bf4705969b))
+
 ## [1.1.3](https://github.com/YeMao-Zi/ym-sku/compare/1.1.2...1.1.3) (2024-11-27)
 
 ### 🐛 Bug Fixes | Bug 修复
