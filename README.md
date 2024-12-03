@@ -1,6 +1,6 @@
 ## 介绍
 
-基于 vue3 + ts + hooks 的响应式 sku 数据处理插件
+sku 数据处理插件
 为了样式的可定制化,只处理 sku 数据,UI 可自己随意绘制
 基本功能应该都能实现
 
@@ -17,6 +17,8 @@ npm install ym-sku
 ![image-20241127152925671](https://s2.loli.net/2024/11/27/kICSYJcGjTPHBeu.png)
 
 [vueExample](https://codesandbox.io/p/devbox/ym-sku-r8xkxm)
+
+[reactExample]()
 
 ## 使用
 
