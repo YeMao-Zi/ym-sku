@@ -25,18 +25,18 @@ export type InitialValue<P, S> = {
   skuId?: any;
 };
 
-export interface DataSource {
-  properties: Property[];
+export interface DataSource<P, S> {
+  properties: P[];
   selected: any[];
   unDisabled: number[];
-  skuList: Sku[];
+  skuList: S[];
   valueInLabel: ValueInLabel;
   vertexList: any[];
-  skuId: any;
-  sku?: Sku;
+  skuId?: any;
+  sku?: S;
 }
 
-export interface ReturnData<P, S> {
+export interface Data<P, S> {
   skuList: S[];
   properties: P[];
   selected: any[];
@@ -45,13 +45,5 @@ export interface ReturnData<P, S> {
 }
 
 export interface Options<P, S> {
-  onChange?: (data: ReturnData<P, S>) => void;
+  onChange?: (data: Data<P, S>) => void;
 }
-
-// export type useSku = (
-//   initialValue: InitialValue,
-//   options: Options
-// ) => {
-//   data: ReturnData;
-//   handleClickAttribute: (propertyIndex: number, attributeIndex: number) => Attribute;
-// };

@@ -1,21 +1,14 @@
 import { getPrime, PathFinder, arrayEqual } from "./skuUtil";
-import { createSyncedProxy } from "./tools";
-import type {
-  Property,
-  Sku,
-  InitialValue,
-  DataSource,
-  Attribute,
-  ReturnData,
-  Options,
-} from "./type";
+import { createSyncedProxy, deepClone, useDelay } from "./tools";
+import type { Property, Sku, InitialValue, DataSource, Attribute, Data, Options } from "./type";
 
 const useSku = <P extends Property, S extends Sku>(
   initialValue: InitialValue<P, S>,
   options: Options<P, S> = {}
 ) => {
   const { onChange } = options;
-  const originData: DataSource = {
+
+  const originData: DataSource<P, S> = {
     // 规格
     properties: [],
     selected: [], // 已经选中的规格
@@ -27,7 +20,7 @@ const useSku = <P extends Property, S extends Sku>(
     skuId: undefined,
   };
 
-  const data: ReturnData<P, S> = {
+  let data: Data<P, S> = {
     properties: [],
     skuList: [],
     selected: [],
@@ -39,7 +32,7 @@ const useSku = <P extends Property, S extends Sku>(
 
   let pathFinder: PathFinder;
 
-  const handleClickAttribute = (propertyIndex: number, attributeIndex: number): Attribute => {
+  const selectAttribute = (propertyIndex: number, attributeIndex: number): Attribute => {
     // 获取已经选中的规格,质数，规格枚举值,以及原本规格名称
     const { selected, valueInLabel, properties, skuList } = dataSource;
     // 检查此次选择是否在已选内容中
@@ -147,6 +140,8 @@ const useSku = <P extends Property, S extends Sku>(
           if (attribute.isActive) {
             pathFinder.add(prime);
             dataSource.selected.push(attribute.value);
+          } else {
+            attribute.isActive = false;
           }
         } catch (error) {
           attribute.isActive = false;
@@ -168,7 +163,8 @@ const useSku = <P extends Property, S extends Sku>(
       dataSource.skuId = skuId;
       selectedAttrsBySkuId(skuId);
     }
-    onChange?.(data);
+
+    useDelay(() => onChange?.(data));
   };
 
   const selectedAttrsBySkuId = (skuId: string) => {
@@ -211,9 +207,9 @@ const useSku = <P extends Property, S extends Sku>(
     return names;
   };
 
-  setOptions(initialValue);
+  setOptions(deepClone(initialValue));
 
-  return { data, handleClickAttribute, setOptions, unselectedName };
+  return { data, selectAttribute, setOptions, unselectedName };
 };
 
 export { useSku };

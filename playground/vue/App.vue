@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div v-for="(item, propertyIndex) in dataSourse.properties" :key="propertyIndex">
+    <div v-for="(item, propertyIndex) in data.properties" :key="propertyIndex">
       <div>{{ item.name }}</div>
       <div class="attrbute">
         <div
@@ -17,14 +17,14 @@
         </div>
       </div>
     </div>
-    <p>price:{{ dataSourse.sku?.price }}</p>
+    <p>price:{{ dataSourse?.sku?.price }}</p>
     <button @click="testFn">test</button>
   </div>
 </template>
 
 <script lang="ts" setup>
 import { Property } from "lib/type";
-import { reactive } from "vue";
+import { reactive, ref } from "vue";
 import { useSku } from "ym-sku";
 
 const properties: Property[] = [
@@ -88,26 +88,22 @@ const props = {
   // skuId: "40", // select skuId:40
 };
 
-const dataSourse = reactive({
-  properties,
-  skuList,
-  selected: [],
-  sku: undefined,
-});
-
-const { handleClickAttribute, unselectedName } = useSku(props, {
-  onChange(data) {
-    const { properties, skuList, selected, sku } = data;
-    dataSourse.properties = properties;
-    dataSourse.skuList = skuList;
-    dataSourse.selected = selected;
-    dataSourse.sku = sku;
-    console.log(data, "data");
+const {
+  data: dataSourse,
+  selectAttribute,
+  setOptions,
+  unselectedName,
+} = useSku(props, {
+  onChange() {
+    const { properties } = dataSourse;
+    data.properties = properties;
   },
 });
 
+const data = reactive({ properties: dataSourse.properties });
+
 const handleClick = (propertyIndex: number, attributeIndex: number) => {
-  const attrbute = handleClickAttribute(propertyIndex, attributeIndex);
+  const attrbute = selectAttribute(propertyIndex, attributeIndex);
   console.log(attrbute);
 };
 
