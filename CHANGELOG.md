@@ -1,5 +1,15 @@
 
 
+## [2.0.0-0](https://github.com/YeMao-Zi/ym-sku/compare/1.1.4...2.0.0-0) (2024-12-04)
+
+### ✨ Features | 新功能
+
+* add react demo ([64bbfdf](https://github.com/YeMao-Zi/ym-sku/commit/64bbfdff4c427e6b9cd2a398e27f1d7b15e1d80d))
+
+### ♻ Code Refactoring | 代码重构
+
+* remove vue  using js only ([5436e11](https://github.com/YeMao-Zi/ym-sku/commit/5436e11e2ca7b973938f67e3e59b1e487c2283fd))
+
 ## [1.1.4](https://github.com/YeMao-Zi/ym-sku/compare/1.1.3...1.1.4) (2024-12-02)
 
 ### ⚡ Performance Improvements | 性能优化
