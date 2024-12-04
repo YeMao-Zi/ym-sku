@@ -1,5 +1,7 @@
 
 
+## [2.0.0](https://github.com/YeMao-Zi/ym-sku/compare/2.0.0-0...2.0.0) (2024-12-04)
+
 ## [2.0.0-0](https://github.com/YeMao-Zi/ym-sku/compare/1.1.4...2.0.0-0) (2024-12-04)
 
 ### ✨ Features | 新功能
