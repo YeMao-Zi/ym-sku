@@ -20,12 +20,14 @@ const useSku = <P extends Property, S extends Sku>(
     skuId: undefined,
   };
 
-  let data: Data<P, S> = {
+  let data = {
     properties: [],
     skuList: [],
     selected: [],
     skuId: undefined,
     sku: undefined,
+  } as DataSource<P, S> & {
+    properties: Property[];
   };
 
   const dataSource = createSyncedProxy(originData, data);

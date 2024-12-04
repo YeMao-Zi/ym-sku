@@ -16,9 +16,9 @@ npm install ym-sku
 
 ![image-20241127152925671](https://s2.loli.net/2024/11/27/kICSYJcGjTPHBeu.png)
 
-[vueExample](https://codesandbox.io/p/devbox/ym-sku-r8xkxm)
+[vueExample](https://codesandbox.io/p/devbox/ym-sku-vue-demo-r8xkxm?file=%2Fsrc%2FApp.vue)
 
-[reactExample]()
+[reactExample](https://codesandbox.io/p/devbox/ym-sku-react-demo-2q6vtx?file=%2Fsrc%2FApp.tsx%3A74%2C8)
 
 ## 使用
 

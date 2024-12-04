@@ -23,11 +23,10 @@
 </template>
 
 <script lang="ts" setup>
-import { Property } from "lib/type";
-import { reactive, ref } from "vue";
+import { reactive } from "vue";
 import { useSku } from "ym-sku";
 
-const properties: Property[] = [
+const properties = [
   {
     name: "Size",
     attributes: [
