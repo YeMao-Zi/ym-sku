@@ -1,5 +1,11 @@
 
 
+## [2.0.1](https://github.com/YeMao-Zi/ym-sku/compare/2.0.0...2.0.1) (2024-12-10)
+
+### ✨ Features | 新功能
+
+* 允许手动控制 ([765c127](https://github.com/YeMao-Zi/ym-sku/commit/765c127dd6cf906ce8bd0365a01153d9d202f0ee))
+
 ## [2.0.0](https://github.com/YeMao-Zi/ym-sku/compare/2.0.0-0...2.0.0) (2024-12-04)
 
 ## [2.0.0-0](https://github.com/YeMao-Zi/ym-sku/compare/1.1.4...2.0.0-0) (2024-12-04)
