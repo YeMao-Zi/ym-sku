@@ -175,7 +175,6 @@ const testFn = () => {
   border: 2px solid #fb6e23;
 }
 </style>
-
 ```
 
 ### react
@@ -297,7 +296,8 @@ export default function App() {
   );
 }
 ```
-``` css
+
+```css
 .attrbute {
   display: flex;
   flex-direction: row;
@@ -328,8 +328,79 @@ export default function App() {
 .seletedSpecifications {
   border: 2px solid #fb6e23;
 }
+```
 
+## 手动控制
 
+```ts
+const {
+  data: dataSourse,
+  selectAttribute,
+  setOptions,
+  unselectedName,
+} = useSku(null, {
+  onChange() {
+    // ...
+  },
+});
+
+const properties = [
+  {
+    name: "Size",
+    attributes: [
+      { label: "S", value: "S", isActive: true },
+      { label: "S", value: "M" },
+      { label: "L", value: "L" },
+    ],
+  },
+  {
+    name: "Color",
+    attributes: [{ label: "red", value: "red", isActive: true }, { value: "green" }],
+  },
+  {
+    name: "Figure ",
+    attributes: [
+      { label: "stripe", value: "stripe" },
+      { label: "wave", value: "wave", isActive: true },
+    ],
+  },
+];
+
+const skuList = [
+  {
+    id: 10,
+    attributes: ["S", "red", "stripe"],
+    stock: 12,
+    price: 10,
+    originalPrice: 100,
+  },
+  {
+    id: "20",
+    attributes: ["S", "green", "wave"],
+    stock: 30,
+    price: 20,
+    originalPrice: 100,
+  },
+  {
+    id: "30",
+    attributes: ["M", "red", "stripe"],
+    stock: 20,
+    price: 30,
+    originalPrice: 100,
+  },
+  {
+    id: "40",
+    attributes: ["L", "red"],
+    stock: 15,
+    price: 40,
+    originalPrice: 100,
+  },
+];
+
+setOptions({
+  properties,
+  skuList,
+});
 ```
 
 ## 返回值说明

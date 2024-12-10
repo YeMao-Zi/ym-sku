@@ -92,7 +92,7 @@ const {
   selectAttribute,
   setOptions,
   unselectedName,
-} = useSku(props, {
+} = useSku(null, {
   onChange() {
     const { properties } = dataSourse;
     data.properties = properties;
@@ -105,6 +105,8 @@ const handleClick = (propertyIndex: number, attributeIndex: number) => {
   const attrbute = selectAttribute(propertyIndex, attributeIndex);
   console.log(attrbute);
 };
+
+setOptions(props);
 
 const testFn = () => {
   const names = unselectedName();

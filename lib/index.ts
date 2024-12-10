@@ -3,7 +3,7 @@ import { createSyncedProxy, deepClone, useDelay } from "./tools";
 import type { Property, Sku, InitialValue, DataSource, Attribute, Data, Options } from "./type";
 
 const useSku = <P extends Property, S extends Sku>(
-  initialValue: InitialValue<P, S>,
+  initialValue: InitialValue<P, S> | null,
   options: Options<P, S> = {}
 ) => {
   const { onChange } = options;
@@ -209,7 +209,7 @@ const useSku = <P extends Property, S extends Sku>(
     return names;
   };
 
-  setOptions(deepClone(initialValue));
+  initialValue && setOptions(deepClone(initialValue));
 
   return { data, selectAttribute, setOptions, unselectedName };
 };
