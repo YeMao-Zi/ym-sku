@@ -66,7 +66,10 @@ const properties = [
   },
   {
     name: "Color",
-    attributes: [{ label: "red", value: "red", isActive: true }, { value: "green" }],
+    attributes: [
+      { label: "red", value: "red", isActive: true },
+      { value: "green" },
+    ],
   },
   {
     name: "Figure ",
@@ -77,6 +80,7 @@ const properties = [
   },
 ];
 
+// id 和 attributes 必传其他属性可以根据业务决定加什么属性
 const skuList = [
   {
     id: 10,
@@ -136,7 +140,7 @@ const handleClick = (propertyIndex: number, attributeIndex: number) => {
 const testFn = () => {
   const names = unselectedName();
   if (names.length) {
-    alert(`please select ${names.join(",")}`);
+    alert(`请选择 ${names.join(",")}`);
   }
   // select skuId:40
   // setOptions({ skuId: "40" });
@@ -179,7 +183,7 @@ const testFn = () => {
 
 ### react
 
-```ts
+```tsx
 import { useMemo, useState } from "react";
 import "./styles.css";
 import { useSku } from "ym-sku";
@@ -196,7 +200,10 @@ const properties = [
   },
   {
     name: "Color",
-    attributes: [{ label: "red", value: "red", isActive: true }, { value: "green" }],
+    attributes: [
+      { label: "red", value: "red", isActive: true },
+      { value: "green" },
+    ],
   },
   {
     name: "Figure ",
@@ -207,6 +214,7 @@ const properties = [
   },
 ];
 
+// id 和 attributes 必传其他属性可以根据业务决定加什么属性
 const skuList = [
   {
     id: 10,
@@ -264,7 +272,7 @@ export default function App() {
   const testFn = () => {
     const names = unselectedName();
     if (names.length) {
-      alert(`please select ${names.join(",")}`);
+      alert(`请选择 ${names.join(",")}`);
     }
     // select skuId:40
     // setOptions({ skuId: "40" });
@@ -278,9 +286,9 @@ export default function App() {
           <div className="attrbute">
             {item.attributes.map((attribute, attributeIndex) => (
               <div
-                className={`weight ${attribute.isActive ? "seletedSpecifications" : ""} ${
-                  attribute?.isDisabled ? "disabledStyle" : ""
-                }`}
+                className={`weight ${
+                  attribute.isActive ? "seletedSpecifications" : ""
+                } ${attribute?.isDisabled ? "disabledStyle" : ""}`}
                 key={attributeIndex}
                 onClick={() => handleClick(propertyIndex, attributeIndex)}
               >
@@ -355,7 +363,10 @@ const properties = [
   },
   {
     name: "Color",
-    attributes: [{ label: "red", value: "red", isActive: true }, { value: "green" }],
+    attributes: [
+      { label: "red", value: "red", isActive: true },
+      { value: "green" },
+    ],
   },
   {
     name: "Figure ",
@@ -366,6 +377,7 @@ const properties = [
   },
 ];
 
+// id 和 attributes 必传其他属性可以根据业务决定加什么属性
 const skuList = [
   {
     id: 10,
@@ -397,6 +409,7 @@ const skuList = [
   },
 ];
 
+// 将 properties 中的 isActive 手动更改为 true 可以设置标签是否选中
 setOptions({
   properties,
   skuList,
@@ -413,7 +426,9 @@ setOptions({
   selectAttribute:(propertyIndex,attributeIndex)=>Attribute,
   // 手动更改指定数据
   setOptions:({
-    properties,skuList,skuId
+    properties,
+    skuList,
+    skuId
   })=>void,
   // 获取当前未选择的标签
   unselectedName:()=>any[]

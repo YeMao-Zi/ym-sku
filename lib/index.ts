@@ -1,6 +1,14 @@
 import { getPrime, PathFinder, arrayEqual } from "./skuUtil";
 import { createSyncedProxy, deepClone, useDelay } from "./tools";
-import type { Property, Sku, InitialValue, DataSource, Attribute, Data, Options } from "./type";
+import type {
+  Property,
+  Sku,
+  InitialValue,
+  DataSource,
+  Attribute,
+  Data,
+  Options,
+} from "./type";
 
 const useSku = <P extends Property, S extends Sku>(
   initialValue: InitialValue<P, S> | null,
@@ -34,7 +42,10 @@ const useSku = <P extends Property, S extends Sku>(
 
   let pathFinder: PathFinder;
 
-  const selectAttribute = (propertyIndex: number, attributeIndex: number): Attribute => {
+  const selectAttribute = (
+    propertyIndex: number,
+    attributeIndex: number
+  ): Attribute => {
     // 获取已经选中的规格,质数，规格枚举值,以及原本规格名称
     const { selected, valueInLabel, properties, skuList } = dataSource;
     // 检查此次选择是否在已选内容中
@@ -53,9 +64,9 @@ const useSku = <P extends Property, S extends Sku>(
       } else if (light[propertyIndex].includes(2)) {
         // 如果同规格中，有选中，则先移除选中，
         // 获取需要移除的同行规格
-        const removeType = properties[propertyIndex]["attributes"].map((item) => item.value)[
-          light[propertyIndex].indexOf(2)
-        ];
+        const removeType = properties[propertyIndex]["attributes"].map(
+          (item) => item.value
+        )[light[propertyIndex].indexOf(2)];
         // 获取需要提出的同行规格质数
         const removePrime = Reflect.get(valueInLabel, removeType);
         // 移除
@@ -86,7 +97,9 @@ const useSku = <P extends Property, S extends Sku>(
       return item;
     });
 
-    const sku = skuList.find((item) => arrayEqual(item.attributes, dataSource.selected));
+    const sku = skuList.find((item) =>
+      arrayEqual(item.attributes, dataSource.selected)
+    );
     if (sku) {
       dataSource.skuId = sku.id;
       dataSource.sku = sku;
@@ -104,6 +117,14 @@ const useSku = <P extends Property, S extends Sku>(
       skuList = dataSource.skuList,
       skuId = dataSource.skuId,
     } = options;
+    if (!properties.length) {
+      console.error("properties is empty");
+      return;
+    }
+    if (!skuList.length) {
+      console.error("skuList is empty");
+      return;
+    }
     // 抹平规格内容
     properties.forEach((prop) => {
       prop.attributes.forEach((attr) => {
@@ -151,7 +172,9 @@ const useSku = <P extends Property, S extends Sku>(
         }
         // 获取不可选规格内容
         unDisabled = pathFinder.getWay().flat();
-        attribute.isDisabled = !unDisabled.includes(valueInLabel[attribute.value]);
+        attribute.isDisabled = !unDisabled.includes(
+          valueInLabel[attribute.value]
+        );
       });
       return item;
     });
@@ -198,7 +221,9 @@ const useSku = <P extends Property, S extends Sku>(
         if (dataSource.skuId) {
           const selectedSort = dataSource.selected.slice().sort();
           const skuAttrbutesSort = dataSource.sku.attributes.slice().sort();
-          if (JSON.stringify(selectedSort) !== JSON.stringify(skuAttrbutesSort)) {
+          if (
+            JSON.stringify(selectedSort) !== JSON.stringify(skuAttrbutesSort)
+          ) {
             names.push(prop.name);
           }
         } else {
