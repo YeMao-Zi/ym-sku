@@ -1,5 +1,11 @@
 
 
+## [2.0.2](https://github.com/YeMao-Zi/ym-sku/compare/2.0.1...2.0.2) (2025-09-03)
+
+### 🐛 Bug Fixes | Bug 修复
+
+* setOptions属性控制 ([b7c97ac](https://github.com/YeMao-Zi/ym-sku/commit/b7c97ac59c0dc5a6c4bed35a7890fc9d39d8e463))
+
 ## [2.0.1](https://github.com/YeMao-Zi/ym-sku/compare/2.0.0...2.0.1) (2024-12-10)
 
 ### ✨ Features | 新功能
