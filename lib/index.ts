@@ -10,25 +10,32 @@ import type {
   Options,
 } from "./type";
 
+/**
+ * SKU 选择处理 Hook
+ * @param initialValue 初始值
+ * @param options 配置选项
+ * @returns SKU 处理工具对象
+ */
 const useSku = <P extends Property, S extends Sku>(
   initialValue: InitialValue<P, S> | null,
   options: Options<P, S> = {}
 ) => {
   const { onChange } = options;
 
+  // 原始数据源
   const originData: DataSource<P, S> = {
-    // 规格
     properties: [],
-    selected: [], // 已经选中的规格
-    unDisabled: [], // 可选规格
-    skuList: [], // 可用sku
-    valueInLabel: {}, // 质数，规格枚举值
-    vertexList: [],
+    selected: [], // 已选中的规格值数组
+    unDisabled: [], // 可选的规格质数数组
+    skuList: [], // 可用 SKU 列表
+    valueInLabel: {}, // 规格值到质数的映射
+    vertexList: [], // 所有规格值的扁平数组
     sku: undefined,
     skuId: undefined,
   };
 
-  let data = {
+  // 同步数据对象（用于外部访问）
+  const data = {
     properties: [],
     skuList: [],
     selected: [],
@@ -38,200 +45,386 @@ const useSku = <P extends Property, S extends Sku>(
     properties: Property[];
   };
 
+  // 创建同步代理
   const dataSource = createSyncedProxy(originData, data);
 
+  // 路径查找器实例
   let pathFinder: PathFinder;
 
-  const selectAttribute = (
-    propertyIndex: number,
-    attributeIndex: number
-  ): Attribute => {
-    // 获取已经选中的规格,质数，规格枚举值,以及原本规格名称
-    const { selected, valueInLabel, properties, skuList } = dataSource;
-    // 检查此次选择是否在已选内容中
-    const attribute = properties[propertyIndex]["attributes"][attributeIndex];
-    if (attribute.isDisabled) return attribute;
-    const type = attribute.value;
-    const prime = Reflect.get(valueInLabel, type);
-    const index = selected.indexOf(type);
-    // 获取已经有的矩阵值
-    const light = pathFinder.light;
-    // 如果未选中则提供选中，如果选中移除
-    try {
-      if (index > -1) {
-        pathFinder.remove(prime);
-        selected.splice(index, 1);
-      } else if (light[propertyIndex].includes(2)) {
-        // 如果同规格中，有选中，则先移除选中，
-        // 获取需要移除的同行规格
-        const removeType = properties[propertyIndex]["attributes"].map(
-          (item) => item.value
-        )[light[propertyIndex].indexOf(2)];
-        // 获取需要提出的同行规格质数
-        const removePrime = Reflect.get(valueInLabel, removeType);
-        // 移除
-        pathFinder.remove(removePrime);
-        selected.splice(selected.indexOf(removeType), 1);
-        //移除同行后，添加当前选择规格
-        pathFinder.add(prime);
-        selected.push(type);
-      } else {
-        pathFinder.add(prime);
-        selected.push(type);
-      }
-    } catch (error) {
-      console.error(error);
-    }
+  /**
+   * 更新所有属性的状态（是否可选、是否激活）
+   */
+  const updatePropertiesState = (): void => {
+    const { properties, valueInLabel, unDisabled, selected } = dataSource;
 
-    dataSource.selected = selected;
-    // 更新不可选规格
-    dataSource.unDisabled = pathFinder.getWay().flat();
-
-    dataSource.properties = properties.map((item) => {
-      item.attributes.forEach((attribute) => {
-        attribute.isDisabled = !dataSource.unDisabled.includes(
-          Reflect.get(valueInLabel, attribute.value)
-        );
+    dataSource.properties = properties.map((property) => {
+      property.attributes.forEach((attribute) => {
+        const prime = valueInLabel[attribute.value];
+        attribute.isDisabled = !unDisabled.includes(prime);
         attribute.isActive = selected.includes(attribute.value);
       });
-      return item;
+      return property;
     });
+  };
 
-    const sku = skuList.find((item) =>
-      arrayEqual(item.attributes, dataSource.selected)
+  /**
+   * 根据已选规格更新对应的 SKU 信息
+   */
+  const updateSkuInfo = (): void => {
+    const { skuList, selected } = dataSource;
+
+    if (selected.length === 0) {
+      dataSource.skuId = "";
+      dataSource.sku = undefined;
+      return;
+    }
+
+    const matchedSku = skuList.find((sku) =>
+      arrayEqual(sku.attributes, selected)
     );
-    if (sku) {
-      dataSource.skuId = sku.id;
-      dataSource.sku = sku;
+
+    if (matchedSku) {
+      dataSource.skuId = matchedSku.id;
+      dataSource.sku = matchedSku;
     } else {
       dataSource.skuId = "";
       dataSource.sku = undefined;
     }
+  };
+
+  /**
+   * 更新不可选规格列表
+   */
+  const updateUnDisabled = (): void => {
+    dataSource.unDisabled = pathFinder.getWay().flat();
+  };
+
+  /**
+   * 触发变更回调
+   */
+  const triggerChange = (): void => {
     onChange?.(data);
+  };
+
+  /**
+   * 选择/取消选择规格属性
+   * @param propertyIndex 规格索引
+   * @param attributeIndex 属性索引
+   * @returns 被操作的属性对象
+   */
+  const selectAttribute = (
+    propertyIndex: number,
+    attributeIndex: number
+  ): Attribute => {
+    const { selected, valueInLabel, properties } = dataSource;
+    const attribute = properties[propertyIndex]?.attributes[attributeIndex];
+
+    // 参数验证
+    if (!attribute) {
+      console.warn(
+        `Invalid attribute index: propertyIndex=${propertyIndex}, attributeIndex=${attributeIndex}`
+      );
+      return properties[propertyIndex]?.attributes[0] || ({} as Attribute);
+    }
+
+    // 如果属性已禁用，直接返回
+    if (attribute.isDisabled) {
+      return attribute;
+    }
+
+    const attributeValue = attribute.value;
+    const prime = valueInLabel[attributeValue];
+    const selectedIndex = selected.indexOf(attributeValue);
+    const light = pathFinder.light;
+    const hasSelectedInSameProperty = light[propertyIndex].includes(2);
+
+    try {
+      // 情况1: 如果已选中，则取消选择
+      if (selectedIndex > -1) {
+        pathFinder.remove(prime);
+        selected.splice(selectedIndex, 1);
+      }
+      // 情况2: 如果同规格中已有选中项，先移除旧的选择，再添加新的
+      else if (hasSelectedInSameProperty) {
+        // 找到同规格中已选中的属性值
+        const selectedPrimeIndex = light[propertyIndex].indexOf(2);
+        const selectedAttributeValue = properties[propertyIndex].attributes[
+          selectedPrimeIndex
+        ].value;
+        const selectedPrime = valueInLabel[selectedAttributeValue];
+
+        // 移除旧选择
+        pathFinder.remove(selectedPrime);
+        selected.splice(selected.indexOf(selectedAttributeValue), 1);
+
+        // 添加新选择
+        pathFinder.add(prime);
+        selected.push(attributeValue);
+      }
+      // 情况3: 直接添加新选择
+      else {
+        pathFinder.add(prime);
+        selected.push(attributeValue);
+      }
+
+      // 更新选中数组
+      dataSource.selected = [...selected];
+
+      // 更新不可选规格列表
+      updateUnDisabled();
+
+      // 更新属性状态
+      updatePropertiesState();
+
+      // 更新 SKU 信息
+      updateSkuInfo();
+
+      // 触发变更回调
+      triggerChange();
+    } catch (error) {
+      console.error("选择规格时发生错误:", error);
+      return attribute;
+    }
+
     return attribute;
   };
 
-  const setOptions = (options: Partial<InitialValue<P, S>>) => {
+  /**
+   * 构建规格值到质数的映射
+   */
+  const buildValueInLabel = (
+    properties: P[]
+  ): Record<string, number> => {
+    // 收集所有规格值
+    const vertexList: any[] = [];
+    properties.forEach((prop) => {
+      prop.attributes.forEach((attr) => {
+        vertexList.push(attr.value);
+      });
+    });
+
+    // 生成对应数量的质数
+    const primes = getPrime(vertexList.length);
+
+    // 构建映射关系
+    const valueInLabel: Record<string, number> = {};
+    vertexList.forEach((value, index) => {
+      valueInLabel[value] = primes[index];
+    });
+
+    return valueInLabel;
+  };
+
+  /**
+   * 构建规格质数矩阵
+   */
+  const buildPrimeMatrix = (
+    properties: P[],
+    valueInLabel: Record<string, number>
+  ): number[][] => {
+    return properties.map((property) =>
+      property.attributes.map((attr) => valueInLabel[attr.value])
+    );
+  };
+
+  /**
+   * 构建 SKU 质数组合数组
+   */
+  const buildSkuPrimeCombinations = (
+    skuList: S[],
+    valueInLabel: Record<string, number>
+  ): number[][] => {
+    return skuList.map((sku) =>
+      sku.attributes.map((attrValue) => valueInLabel[attrValue])
+    );
+  };
+
+  /**
+   * 初始化属性状态（处理预选中的属性）
+   */
+  const initializePropertiesState = (
+    properties: P[],
+    valueInLabel: Record<string, number>
+  ): P[] => {
+    const processedProperties = properties.map((property) => {
+      property.attributes.forEach((attribute) => {
+        const prime = valueInLabel[attribute.value];
+        const wasActive = attribute.isActive === true;
+
+        // 尝试添加预选中的属性
+        if (wasActive) {
+          try {
+            pathFinder.add(prime);
+            if (!dataSource.selected.includes(attribute.value)) {
+              dataSource.selected.push(attribute.value);
+            }
+          } catch (error) {
+            // 如果预选中的属性冲突，重置为未选中
+            attribute.isActive = false;
+            console.warn(
+              `预选中的属性冲突，已重置: ${attribute.value}`,
+              error
+            );
+          }
+        } else {
+          attribute.isActive = false;
+        }
+
+        // 更新不可选状态
+        updateUnDisabled();
+        attribute.isDisabled = !dataSource.unDisabled.includes(prime);
+      });
+      return property;
+    });
+
+    return processedProperties;
+  };
+
+  /**
+   * 设置 SKU 选项
+   * @param options 配置选项
+   */
+  const setOptions = (
+    options: Partial<InitialValue<P, S>>
+  ): void => {
     const {
       properties = dataSource.properties,
       skuList = dataSource.skuList,
       skuId = dataSource.skuId,
     } = options;
-    if (!properties.length) {
-      console.error("properties is empty");
+
+    // 参数验证
+    if (!properties || properties.length === 0) {
+      console.error("properties 不能为空");
       return;
     }
-    if (!skuList.length) {
-      console.error("skuList is empty");
+    if (!skuList || skuList.length === 0) {
+      console.error("skuList 不能为空");
       return;
     }
-    // 抹平规格内容
-    properties.forEach((prop) => {
-      prop.attributes.forEach((attr) => {
-        dataSource.vertexList.push(attr.value);
-      });
-    });
-    // 通过抹平规格，获取规格对应质数
-    const prime = getPrime(dataSource.vertexList.length);
-    // 质数对应规格数 枚举值处理
-    const valueInLabel: Record<string, number> = {};
-    dataSource.vertexList.forEach((item, index) => {
-      valueInLabel[item] = prime[index];
-    });
 
-    // 根据规格坐标，排序质数坐标
-    const way = properties.map((i) => {
-      return i.attributes.map((ii) => valueInLabel[ii.value]);
-    });
+    // 重置选中状态
+    dataSource.selected = [];
 
-    // 初始化规格展示内容
-    pathFinder = new PathFinder(
-      way,
-      skuList.map((item) => {
-        // 筛选可选的 SKU
-        return item.attributes.map((ii) => valueInLabel[ii]);
-      })
+    // 构建规格值到质数的映射
+    const valueInLabel = buildValueInLabel(properties);
+    dataSource.valueInLabel = valueInLabel;
+
+    // 构建规格质数矩阵
+    const primeMatrix = buildPrimeMatrix(properties, valueInLabel);
+
+    // 构建 SKU 质数组合数组
+    const skuPrimeCombinations = buildSkuPrimeCombinations(
+      skuList,
+      valueInLabel
     );
 
-    // 获取不可选规格内容
-    let unDisabled = pathFinder.getWay().flat();
+    // 初始化路径查找器
+    pathFinder = new PathFinder(primeMatrix, skuPrimeCombinations);
 
-    const _properties = properties.map((item) => {
-      item.attributes.forEach((attribute) => {
-        const prime = Reflect.get(valueInLabel, attribute.value);
-        try {
-          if (attribute.isActive) {
-            pathFinder.add(prime);
-            dataSource.selected.push(attribute.value);
-          } else {
-            attribute.isActive = false;
-          }
-        } catch (error) {
-          attribute.isActive = false;
-          console.error(`selcted attribute conflict: ${attribute.value}`);
-        }
-        // 获取不可选规格内容
-        unDisabled = pathFinder.getWay().flat();
-        attribute.isDisabled = !unDisabled.includes(
-          valueInLabel[attribute.value]
-        );
-      });
-      return item;
-    });
+    // 初始化不可选规格列表
+    updateUnDisabled();
 
-    dataSource.properties = _properties;
-    dataSource.unDisabled = unDisabled;
-    dataSource.valueInLabel = valueInLabel;
+    // 初始化属性状态（处理预选中的属性）
+    const processedProperties = initializePropertiesState(
+      properties,
+      valueInLabel
+    );
+
+    // 更新数据源
+    dataSource.properties = processedProperties;
     dataSource.skuList = skuList;
 
+    // 如果指定了 skuId，根据 skuId 选择属性
     if (skuId) {
       dataSource.skuId = skuId;
       selectedAttrsBySkuId(skuId);
+    } else {
+      // 更新 SKU 信息
+      updateSkuInfo();
     }
 
-    useDelay(() => onChange?.(data));
+    // 延迟触发变更回调（避免在初始化时频繁触发）
+    useDelay(() => triggerChange());
   };
 
-  const selectedAttrsBySkuId = (skuId: string) => {
-    const { properties, valueInLabel } = dataSource;
+  /**
+   * 根据 SKU ID 选择对应的属性
+   * @param skuId SKU ID
+   */
+  const selectedAttrsBySkuId = (skuId: string): void => {
+    const { valueInLabel } = dataSource;
     const sku = dataSource.skuList.find((item) => item.id === skuId);
-    dataSource.sku = sku;
-    dataSource.selected = sku?.attributes ?? [];
-    dataSource.selected.forEach((item) => pathFinder.add(valueInLabel[item]));
-    dataSource.unDisabled = pathFinder.getWay().flat();
-    dataSource.properties = properties.map((item) => {
-      item.attributes.forEach((attribute) => {
-        attribute.isDisabled = !dataSource.unDisabled.includes(
-          Reflect.get(valueInLabel, attribute.value)
-        );
-        attribute.isActive = dataSource.selected.includes(attribute.value);
-      });
-      return item;
-    });
-  };
 
-  // 获取未选中标签
-  const unselectedName = () => {
-    const names: string[] = [];
-    dataSource.properties.forEach((prop) => {
-      const hasLabel = prop.attributes.some((attr) => {
-        return attr.isActive === true;
-      });
-      if (!hasLabel) {
-        if (dataSource.skuId) {
-          const selectedSort = dataSource.selected.slice().sort();
-          const skuAttrbutesSort = dataSource.sku.attributes.slice().sort();
-          if (
-            JSON.stringify(selectedSort) !== JSON.stringify(skuAttrbutesSort)
-          ) {
-            names.push(prop.name);
-          }
-        } else {
-          names.push(prop.name);
+    if (!sku) {
+      console.warn(`未找到 ID 为 ${skuId} 的 SKU`);
+      return;
+    }
+
+    // 重置选中状态
+    dataSource.selected = [];
+    pathFinder = new PathFinder(
+      buildPrimeMatrix(dataSource.properties, valueInLabel),
+      buildSkuPrimeCombinations(dataSource.skuList, valueInLabel)
+    );
+
+    // 设置 SKU 信息
+    dataSource.sku = sku;
+    dataSource.skuId = skuId;
+
+    // 根据 SKU 的属性选择对应的规格
+    sku.attributes.forEach((attrValue) => {
+      const prime = valueInLabel[attrValue];
+      if (prime) {
+        try {
+          pathFinder.add(prime);
+          dataSource.selected.push(attrValue);
+        } catch (error) {
+          console.warn(`选择属性 ${attrValue} 时发生错误:`, error);
         }
       }
     });
-    return names;
+
+    // 更新不可选规格列表
+    updateUnDisabled();
+
+    // 更新属性状态
+    updatePropertiesState();
+
+    // 触发变更回调
+    triggerChange();
+  };
+
+  /**
+   * 获取未选中规格的名称列表
+   * @returns 未选中的规格名称数组
+   */
+  const unselectedName = (): string[] => {
+    const unselectedNames: string[] = [];
+
+    dataSource.properties.forEach((property) => {
+      // 检查该规格是否有选中的属性
+      const hasSelectedAttribute = property.attributes.some(
+        (attr) => attr.isActive === true
+      );
+
+      if (!hasSelectedAttribute) {
+        // 如果有 SKU 且已选规格与 SKU 规格完全匹配，则不添加到未选中列表
+        if (dataSource.skuId && dataSource.sku) {
+          const selectedSorted = [...dataSource.selected].sort();
+          const skuAttributesSorted = [...dataSource.sku.attributes].sort();
+
+          // 使用 arrayEqual 代替 JSON.stringify（更高效）
+          if (!arrayEqual(selectedSorted, skuAttributesSorted)) {
+            unselectedNames.push(property.name);
+          }
+        } else {
+          unselectedNames.push(property.name);
+        }
+      }
+    });
+
+    return unselectedNames;
   };
 
   initialValue && setOptions(deepClone(initialValue));

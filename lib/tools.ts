@@ -1,32 +1,64 @@
-export function createSyncedProxy<T extends Object>(target: T, syncTarget: Object) {
+/**
+ * 创建同步代理对象，当设置属性时自动同步到目标对象
+ */
+export function createSyncedProxy<T extends Record<string, any>>(
+  target: T,
+  syncTarget: Record<string, any>
+): T {
   return new Proxy(target, {
-    set(obj, prop, value) {
+    set(obj, prop: string | symbol, value: any) {
+      const propKey = String(prop);
       // 当在代理对象上设置属性时，也更新同步对象的属性
-      if (Reflect.has(syncTarget, prop)) {
-        syncTarget[prop] = value;
+      if (propKey in syncTarget) {
+        syncTarget[propKey] = value;
       }
       return Reflect.set(obj, prop, value);
     },
-    get(obj, prop, receiver) {
+    get(obj, prop: string | symbol, receiver: any) {
       return Reflect.get(obj, prop, receiver);
     },
   });
 }
 
-export const deepClone = (obj: any) => {
-  if (typeof obj !== "object") {
+/**
+ * 深度克隆对象，支持常见数据类型
+ */
+export function deepClone<T>(obj: T): T {
+  // 处理 null 和 undefined
+  if (obj == null || typeof obj !== "object") {
     return obj;
   }
-  let objClone = new obj.constructor(); //使用构造器,是对象输出{}，是数组输出[],是基本数据类型就输出原始数据。
-  for (const key in obj) {
-    // 深层拷贝，如果还有结构调用自身实现递归
-    objClone[key] = deepClone(obj[key]);
-  }
-  //基本类型直接赋值
-  return objClone;
-};
 
-export function useDelay(fn: Function, delay = 0) {
+  // 处理 Date 对象
+  if (obj instanceof Date) {
+    return new Date(obj.getTime()) as T;
+  }
+
+  // 处理 RegExp 对象
+  if (obj instanceof RegExp) {
+    return new RegExp(obj.source, obj.flags) as T;
+  }
+
+  // 处理数组
+  if (Array.isArray(obj)) {
+    return obj.map((item) => deepClone(item)) as T;
+  }
+
+  // 处理普通对象
+  const objClone = {} as T;
+  for (const key in obj) {
+    if (Object.prototype.hasOwnProperty.call(obj, key)) {
+      objClone[key] = deepClone(obj[key]);
+    }
+  }
+
+  return objClone;
+}
+
+/**
+ * 延迟执行函数
+ */
+export function useDelay(fn: () => void, delay = 0): ReturnType<typeof setTimeout> {
   return setTimeout(() => {
     fn();
   }, delay);
