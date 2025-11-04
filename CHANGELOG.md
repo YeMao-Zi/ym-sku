@@ -1,5 +1,11 @@
 
 
+## [2.1.0](https://github.com/YeMao-Zi/ym-sku/compare/2.0.2...2.1.0) (2025-11-04)
+
+### ⚡ Performance Improvements | 性能优化
+
+* 优化代码并添加测试用例 ([f85a0fd](https://github.com/YeMao-Zi/ym-sku/commit/f85a0fd13f9a6cebbeccf6a58fc38e7a32b60bf3))
+
 ## [2.0.2](https://github.com/YeMao-Zi/ym-sku/compare/2.0.1...2.0.2) (2025-09-03)
 
 ### 🐛 Bug Fixes | Bug 修复

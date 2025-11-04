@@ -1,7 +1,7 @@
 {
   "name": "ym-sku",
   "description": "sku 数据处理插件, 为了样式的可定制化,只处理 sku 数据,UI 可自己随意绘制",
-  "version": "2.0.2",
+  "version": "2.1.0",
   "private": false,
   "exports": {
     ".": {
