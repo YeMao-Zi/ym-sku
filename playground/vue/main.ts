@@ -1,5 +1,6 @@
 import { createApp } from 'vue';
 import App from './App2.vue';
+// import App from './App.vue';
 
 const app = createApp(App);
 

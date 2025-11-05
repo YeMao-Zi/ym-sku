@@ -132,11 +132,20 @@ const useSku = <P extends Property, S extends Sku>(
       return attribute;
     }
 
+    // 保护 pathFinder 未初始化的情况
+    if (!pathFinder) {
+      console.error(
+        "pathFinder 未初始化，无法选择属性，请先调用 setOptions 初始化。"
+      );
+      return attribute;
+    }
+
     const attributeValue = attribute.value;
     const prime = valueInLabel[attributeValue];
     const selectedIndex = selected.indexOf(attributeValue);
     const light = pathFinder.light;
-    const hasSelectedInSameProperty = light[propertyIndex].includes(2);
+    const hasSelectedInSameProperty =
+      Array.isArray(light[propertyIndex]) && light[propertyIndex].includes(2);
 
     try {
       // 情况1: 如果已选中，则取消选择
@@ -146,18 +155,16 @@ const useSku = <P extends Property, S extends Sku>(
       }
       // 情况2: 如果同规格中已有选中项，先移除旧的选择，再添加新的
       else if (hasSelectedInSameProperty) {
-        // 找到同规格中已选中的属性值
-        const selectedPrimeIndex = light[propertyIndex].indexOf(2);
-        const selectedAttributeValue = properties[propertyIndex].attributes[
-          selectedPrimeIndex
-        ].value;
+        const selectedPrimeIndex = (light[propertyIndex] as number[]).indexOf(
+          2
+        );
+        const selectedAttributeValue =
+          properties[propertyIndex].attributes[selectedPrimeIndex].value;
         const selectedPrime = valueInLabel[selectedAttributeValue];
 
-        // 移除旧选择
         pathFinder.remove(selectedPrime);
         selected.splice(selected.indexOf(selectedAttributeValue), 1);
 
-        // 添加新选择
         pathFinder.add(prime);
         selected.push(attributeValue);
       }
@@ -167,8 +174,8 @@ const useSku = <P extends Property, S extends Sku>(
         selected.push(attributeValue);
       }
 
-      // 更新选中数组
-      dataSource.selected = [...selected];
+      // 更新选中数组（只做一次浅拷贝）
+      dataSource.selected = selected.slice();
 
       // 更新不可选规格列表
       updateUnDisabled();
@@ -192,9 +199,7 @@ const useSku = <P extends Property, S extends Sku>(
   /**
    * 构建规格值到质数的映射
    */
-  const buildValueInLabel = (
-    properties: P[]
-  ): Record<string, number> => {
+  const buildValueInLabel = (properties: P[]): Record<string, number> => {
     // 收集所有规格值
     const vertexList: any[] = [];
     properties.forEach((prop) => {
@@ -202,6 +207,18 @@ const useSku = <P extends Property, S extends Sku>(
         vertexList.push(attr.value);
       });
     });
+
+    // 校验唯一性，避免不同属性值冲突覆盖
+    const seen = new Set<string>();
+    for (const v of vertexList) {
+      if (seen.has(v)) {
+        console.warn(
+          `发现重复的属性值 "${v}"，建议保证每个属性值唯一以避免映射冲突。`
+        );
+        break;
+      }
+      seen.add(v);
+    }
 
     // 生成对应数量的质数
     const primes = getPrime(vertexList.length);
@@ -246,47 +263,65 @@ const useSku = <P extends Property, S extends Sku>(
     properties: P[],
     valueInLabel: Record<string, number>
   ): P[] => {
-    const processedProperties = properties.map((property) => {
-      property.attributes.forEach((attribute) => {
+    // 先尝试将所有预选 prime 加入 pathFinder（若添加失败则回退对应属性）
+    const toUpdate: { attribute: Attribute; prime?: number }[] = [];
+
+    for (const property of properties) {
+      for (const attribute of property.attributes) {
         const prime = valueInLabel[attribute.value];
         const wasActive = attribute.isActive === true;
 
-        // 尝试添加预选中的属性
         if (wasActive) {
-          try {
-            pathFinder.add(prime);
-            if (!dataSource.selected.includes(attribute.value)) {
-              dataSource.selected.push(attribute.value);
-            }
-          } catch (error) {
-            // 如果预选中的属性冲突，重置为未选中
-            attribute.isActive = false;
-            console.warn(
-              `预选中的属性冲突，已重置: ${attribute.value}`,
-              error
-            );
-          }
+          toUpdate.push({ attribute, prime });
         } else {
           attribute.isActive = false;
         }
+      }
+    }
 
-        // 更新不可选状态
-        updateUnDisabled();
+    // 保护 pathFinder 未初始化的情况
+    if (!pathFinder) {
+      throw new Error("pathFinder 尚未初始化，无法处理预选属性");
+    }
+
+    // 批量尝试加入已预选的 prime（避免在每次加入后重复计算 unDisabled）
+    for (const item of toUpdate) {
+      try {
+        if (item.prime !== undefined) {
+          pathFinder.add(item.prime);
+          if (!dataSource.selected.includes(item.attribute.value)) {
+            dataSource.selected.push(item.attribute.value);
+          }
+        }
+      } catch (error) {
+        // 如果预选中的属性冲突，重置为未选中
+        item.attribute.isActive = false;
+        console.warn(
+          `预选中的属性冲突，已重置: ${item.attribute.value}`,
+          error
+        );
+      }
+    }
+
+    // 批量更新不可选列表（只调用一次）
+    updateUnDisabled();
+
+    // 根据最终的 unDisabled 更新每个属性的 isDisabled 状态
+    for (const property of properties) {
+      for (const attribute of property.attributes) {
+        const prime = valueInLabel[attribute.value];
         attribute.isDisabled = !dataSource.unDisabled.includes(prime);
-      });
-      return property;
-    });
+      }
+    }
 
-    return processedProperties;
+    return properties;
   };
 
   /**
    * 设置 SKU 选项
    * @param options 配置选项
    */
-  const setOptions = (
-    options: Partial<InitialValue<P, S>>
-  ): void => {
+  const setOptions = (options: Partial<InitialValue<P, S>>): void => {
     const {
       properties = dataSource.properties,
       skuList = dataSource.skuList,
@@ -330,7 +365,6 @@ const useSku = <P extends Property, S extends Sku>(
       properties,
       valueInLabel
     );
-
     // 更新数据源
     dataSource.properties = processedProperties;
     dataSource.skuList = skuList;

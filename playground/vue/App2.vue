@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div v-for="(item, propertyIndex) in data.properties" :key="propertyIndex">
+    <div v-for="(item, propertyIndex) in dataSourse.properties" :key="propertyIndex">
       <div>{{ item.name }}</div>
       <div class="attrbute">
         <div
@@ -34,19 +34,17 @@ export default {
       setOptions,
       unselectedName,
     } = useSku(null, {
-      onChange: () => {
-        const { properties } = this.dataSourse;
-        this.data.properties = properties;
+      onChange: (data) => {
+        console.log(data, "onChange");
+        this.dataSourse = { ...data };
       },
     });
 
     return {
-      properties: dataSourse.properties,
       dataSourse,
       selectAttribute,
       setOptions,
       unselectedName,
-      data: { properties: dataSourse.properties },
     };
   },
   mounted() {
