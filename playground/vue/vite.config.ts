@@ -1,12 +1,15 @@
-import path from 'path';
-import { defineConfig } from 'vite';
-import vue from '@vitejs/plugin-vue';
+import path from "path";
+import { defineConfig } from "vite";
+import vue from "@vitejs/plugin-vue";
 
 export default defineConfig({
   resolve: {
     alias: {
-      'ym-sku': path.resolve(__dirname, '../../lib/index.ts'),
+      "ym-sku": path.resolve(__dirname, "../../lib/index.ts"),
     },
+  },
+  server: {
+    port: 5151,
   },
   plugins: [vue()],
 });
