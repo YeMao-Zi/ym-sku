@@ -135,7 +135,7 @@ const useSku = <P extends Property, S extends Sku>(
     // 保护 pathFinder 未初始化的情况
     if (!pathFinder) {
       console.error(
-        "pathFinder 未初始化，无法选择属性，请先调用 setOptions 初始化。"
+        "pathFinder is not initialized, so properties cannot be selected. Please call setOptions to initialize it first."
       );
       return attribute;
     }
@@ -189,7 +189,7 @@ const useSku = <P extends Property, S extends Sku>(
       // 触发变更回调
       triggerChange();
     } catch (error) {
-      console.error("选择规格时发生错误:", error);
+      console.error("Error occurred while processing the data:", error);
       return attribute;
     }
 
@@ -213,7 +213,7 @@ const useSku = <P extends Property, S extends Sku>(
     for (const v of vertexList) {
       if (seen.has(v)) {
         console.warn(
-          `发现重复的属性值 "${v}"，建议保证每个属性值唯一以避免映射冲突。`
+          `Found duplicate attribute value "${v}", it is recommended to ensure each attribute value is unique to avoid mapping conflicts.`
         );
         break;
       }
@@ -281,7 +281,7 @@ const useSku = <P extends Property, S extends Sku>(
 
     // 保护 pathFinder 未初始化的情况
     if (!pathFinder) {
-      throw new Error("pathFinder 尚未初始化，无法处理预选属性");
+      throw new Error("pathFinder is not initialized, so pre-selected attributes cannot be processed.");
     }
 
     // 批量尝试加入已预选的 prime（避免在每次加入后重复计算 unDisabled）
@@ -297,7 +297,7 @@ const useSku = <P extends Property, S extends Sku>(
         // 如果预选中的属性冲突，重置为未选中
         item.attribute.isActive = false;
         console.warn(
-          `预选中的属性冲突，已重置: ${item.attribute.value}`,
+          `Found conflict in pre-selected attribute, reset: ${item.attribute.value}`,
           error
         );
       }
@@ -327,16 +327,6 @@ const useSku = <P extends Property, S extends Sku>(
       skuList = dataSource.skuList,
       skuId = dataSource.skuId,
     } = options;
-
-    // 参数验证
-    if (!properties || properties.length === 0) {
-      console.error("properties 不能为空");
-      return;
-    }
-    if (!skuList || skuList.length === 0) {
-      console.error("skuList 不能为空");
-      return;
-    }
 
     // 重置选中状态
     dataSource.selected = [];
@@ -391,7 +381,7 @@ const useSku = <P extends Property, S extends Sku>(
     const sku = dataSource.skuList.find((item) => item.id === skuId);
 
     if (!sku) {
-      console.warn(`未找到 ID 为 ${skuId} 的 SKU`);
+      console.warn(`SKU with ID "${skuId}" not found.`);
       return;
     }
 
@@ -414,7 +404,10 @@ const useSku = <P extends Property, S extends Sku>(
           pathFinder.add(prime);
           dataSource.selected.push(attrValue);
         } catch (error) {
-          console.warn(`选择属性 ${attrValue} 时发生错误:`, error);
+          console.warn(
+            `Error occurred while selecting attribute ${attrValue}:`,
+            error
+          );
         }
       }
     });
