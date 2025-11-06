@@ -23,7 +23,7 @@ const useSku = <P extends Property, S extends Sku>(
   const { onChange } = options;
 
   // 原始数据源
-  const originData: DataSource<P, S> = {
+  const dataSource: DataSource<P, S> = {
     properties: [],
     selected: [], // 已选中的规格值数组
     unDisabled: [], // 可选的规格质数数组
@@ -46,7 +46,7 @@ const useSku = <P extends Property, S extends Sku>(
   };
 
   // 创建同步代理
-  const dataSource = createSyncedProxy(originData, data);
+  createSyncedProxy(dataSource, data);
 
   // 路径查找器实例
   let pathFinder: PathFinder;
