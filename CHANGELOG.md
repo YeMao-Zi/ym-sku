@@ -1,5 +1,21 @@
 
 
+## [2.1.1](https://github.com/YeMao-Zi/ym-sku/compare/2.1.0...2.1.1) (2025-11-07)
+
+### 🎫 Chores | 其他更新
+
+* 回测 dataSource ([70d701b](https://github.com/YeMao-Zi/ym-sku/commit/70d701bcca286d10ecfc28a518dfe806f7f787cc))
+* 优化初始化时的属性重置 ([82a2ac3](https://github.com/YeMao-Zi/ym-sku/commit/82a2ac385d86a6df079fa30efa498b6e82e3233b))
+
+### 📝 Documentation | 文档
+
+* 完善文档描述 ([cb618c0](https://github.com/YeMao-Zi/ym-sku/commit/cb618c026f7e5ed72addd7ed318c8da9c958d0a1))
+
+### ♻ Code Refactoring | 代码重构
+
+* **lib:** 优化错误与警告日志 ([cbd5096](https://github.com/YeMao-Zi/ym-sku/commit/cbd5096745580f0c362f4d731a5e0abe1f00aa2c))
+* **lib:** 重命名数据源变量并调整代理创建逻辑 ([b52888a](https://github.com/YeMao-Zi/ym-sku/commit/b52888a352c093f9c3ae52f6dbc77d9a3d3d67dd))
+
 ## [2.1.0](https://github.com/YeMao-Zi/ym-sku/compare/2.0.2...2.1.0) (2025-11-04)
 
 ### ⚡ Performance Improvements | 性能优化
