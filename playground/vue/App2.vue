@@ -3,16 +3,11 @@
     <div v-for="(item, propertyIndex) in dataSourse.properties" :key="propertyIndex">
       <div>{{ item.name }}</div>
       <div class="attrbute">
-        <div
-          v-for="(attribute, attributeIndex) in item.attributes"
-          :key="attributeIndex"
-          @click="handleClick(propertyIndex, attributeIndex)"
-          class="weight"
-          :class="{
+        <div v-for="(attribute, attributeIndex) in item.attributes" :key="attributeIndex"
+          @click="handleClick(propertyIndex, attributeIndex)" class="weight" :class="{
             seletedSpecifications: attribute.isActive,
             disabledStyle: attribute?.isDisabled,
-          }"
-        >
+          }">
           <div>{{ attribute?.label || attribute.value }}</div>
         </div>
       </div>
@@ -50,63 +45,126 @@ export default {
   mounted() {
     const properties = [
       {
-        name: "Size",
-        attributes: [
-          { label: "S", value: "S", isActive: true }, // 默认选中
-          { label: "M", value: "M" },
-          { label: "L", value: "L" },
-        ],
+        "specId": 1001,
+        "name": "颜色",
+        "attributes": [
+          {
+            "itemId": 86,
+            "label": "紫色",
+            "value": "紫色",
+            "active": false,
+            "isActive": false,
+            "isDisabled": false
+          },
+          {
+            "itemId": 87,
+            "label": "黑色",
+            "value": "黑色",
+            "active": false,
+            "isActive": false,
+            "isDisabled": false
+          },
+          {
+            "itemId": 88,
+            "label": "黄色",
+            "value": "黄色",
+            "active": true,
+            "isActive": true,
+            "isDisabled": false
+          }
+        ]
       },
       {
-        name: "Color",
-        attributes: [
-          { label: "red", value: "red", isActive: true },
-          { value: "green" },
-        ],
+        "specId": 1002,
+        "name": "尺码",
+        "attributes": [
+          {
+            "itemId": 103,
+            "label": "sxe123",
+            "value": "sxe123",
+            "active": true,
+            "isActive": true,
+            "isDisabled": false
+          }
+        ]
       },
       {
-        name: "Figure ",
-        attributes: [
-          { label: "stripe", value: "stripe" },
-          { label: "wave", value: "wave", isActive: true }, // 不存在 sku:["S","red","wave"]，会抛出错误且不会被选中
-        ],
-      },
-    ];
-
+        "specId": 1008,
+        "name": "功率",
+        "attributes": [
+          {
+            "itemId": 126,
+            "label": "8杠",
+            "value": "8杠",
+            "active": false,
+            "isActive": false,
+            "isDisabled": false
+          },
+          {
+            "itemId": 127,
+            "label": "350km/h",
+            "value": "350km/h",
+            "active": true,
+            "isActive": true,
+            "isDisabled": false
+          }
+        ]
+      }
+    ]
     const skuList = [
       {
-        id: 10,
-        attributes: ["S", "red", "stripe"],
-        expired: true,
-        stock: 12,
-        price: 10,
-        originalPrice: 100,
+        "id": 383,
+        "attributes": [
+          "紫色",
+          "sxe123",
+          "8杠"
+        ],
+        "item_enable": 1001,
+        "stock": 21,
+        "price": 860,
+        "expired": false
       },
       {
-        id: "20",
-        attributes: ["S", "green", "wave"],
-        stock: 30,
-        price: 20,
-        originalPrice: 100,
+        "id": 386,
+        "attributes": [
+          "黑色",
+          "sxe123",
+          "350km/h"
+        ],
+        "item_enable": 1001,
+        "stock": 524,
+        "price": 34.51,
+        "expired": false
       },
       {
-        id: "30",
-        attributes: ["M", "red", "stripe"],
-        stock: 20,
-        price: 30,
-        originalPrice: 100,
+        "id": 387,
+        "attributes": [
+          "黄色",
+          "sxe123",
+          "8杠"
+        ],
+        "item_enable": 1001,
+        "stock": 211,
+        "price": 1000.01,
+        "expired": false
       },
       {
-        id: "40",
-        attributes: ["L", "red"],
-        stock: 15,
-        price: 40,
-        originalPrice: 100,
-      },
-    ];
+        "id": 388,
+        "attributes": [
+          "黄色",
+          "sxe123",
+          "350km/h"
+        ],
+        "item_enable": 1001,
+        "stock": 4974,
+        "price": 39,
+        "expired": false
+      }
+    ]
+    console.log('mounted setOptions', properties, skuList);
     this.setOptions({
       properties,
-      skuList: skuList.filter((item) => !item.expired),
+      skuList,
     });
   },
   methods: {
