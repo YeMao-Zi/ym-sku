@@ -183,27 +183,23 @@ const testFn = () => {
 ```
 
 ### vue2
+
 ```vue
 <template>
   <div>
-    <div v-for="(item, propertyIndex) in data.properties" :key="propertyIndex">
+    <div v-for="(item, propertyIndex) in dataSourse.properties" :key="propertyIndex">
       <div>{{ item.name }}</div>
       <div class="attrbute">
-        <div
-          v-for="(attribute, attributeIndex) in item.attributes"
-          :key="attributeIndex"
-          @click="handleClick(propertyIndex, attributeIndex)"
-          class="weight"
-          :class="{
+        <div v-for="(attribute, attributeIndex) in item.attributes" :key="attributeIndex"
+          @click="handleClick(propertyIndex, attributeIndex)" class="weight" :class="{
             seletedSpecifications: attribute.isActive,
             disabledStyle: attribute?.isDisabled,
-          }"
-        >
-          <div>{{ attribute?.label || attribute.value }}</div>
+          }">
+          <div>{{ attribute.label || attribute.value }}</div>
         </div>
       </div>
     </div>
-    <p>price:{{ dataSourse?.sku?.price }}</p>
+    <p v-if="dataSourse.sku">price:{{ dataSourse.sku.price }}</p>
     <button @click="testFn">test</button>
   </div>
 </template>
@@ -219,19 +215,16 @@ export default {
       setOptions,
       unselectedName,
     } = useSku(null, {
-      onChange: () => {
-        const { properties } = this.dataSourse;
-        this.data.properties = properties;
+      onChange: (data) => {
+        this.dataSourse = { ...data };
       },
     });
 
     return {
-      properties: dataSourse.properties,
       dataSourse,
       selectAttribute,
       setOptions,
       unselectedName,
-      data: { properties: dataSourse.properties },
     };
   },
   mounted() {
@@ -293,7 +286,7 @@ export default {
     ];
     this.setOptions({
       properties,
-      skuList: skuList.filter((item) => !item.expired),
+      skuList,
     });
   },
   methods: {
@@ -345,7 +338,6 @@ export default {
   border: 2px solid #fb6e23;
 }
 </style>
-
 ```
 
 ### react
