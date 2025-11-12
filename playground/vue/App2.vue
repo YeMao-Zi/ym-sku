@@ -8,11 +8,12 @@
             seletedSpecifications: attribute.isActive,
             disabledStyle: attribute?.isDisabled,
           }">
-          <div>{{ attribute?.label || attribute.value }}</div>
+          <div>{{ attribute.label || attribute.value }}</div>
+          <div class="disabledText">{{ disabledType(attribute) }}</div>
         </div>
       </div>
     </div>
-    <p>price:{{ dataSourse?.sku?.price }}</p>
+    <p v-if="dataSourse.sku">price:{{ dataSourse.sku.price }}</p>
     <button @click="testFn">test</button>
   </div>
 </template>
@@ -21,7 +22,6 @@
 import { useSku } from "ym-sku";
 
 export default {
-  name: "App2",
   data() {
     const {
       data: dataSourse,
@@ -30,12 +30,12 @@ export default {
       unselectedName,
     } = useSku(null, {
       onChange: (data) => {
-        console.log(data, "onChange");
         this.dataSourse = { ...data };
       },
     });
 
     return {
+      skuList: [],
       dataSourse,
       selectAttribute,
       setOptions,
@@ -45,132 +45,86 @@ export default {
   mounted() {
     const properties = [
       {
-        "specId": 1001,
-        "name": "颜色",
-        "attributes": [
-          {
-            "itemId": 86,
-            "label": "紫色",
-            "value": "紫色",
-            "active": false,
-            "isActive": false,
-            "isDisabled": false
-          },
-          {
-            "itemId": 87,
-            "label": "黑色",
-            "value": "黑色",
-            "active": false,
-            "isActive": false,
-            "isDisabled": false
-          },
-          {
-            "itemId": 88,
-            "label": "黄色",
-            "value": "黄色",
-            "active": true,
-            "isActive": true,
-            "isDisabled": false
-          }
-        ]
+        name: "Size",
+        attributes: [
+          { label: "S", value: "S", isActive: true }, // 默认选中
+          { label: "M", value: "M" },
+          { label: "L", value: "L" },
+        ],
       },
       {
-        "specId": 1002,
-        "name": "尺码",
-        "attributes": [
-          {
-            "itemId": 103,
-            "label": "sxe123",
-            "value": "sxe123",
-            "active": true,
-            "isActive": true,
-            "isDisabled": false
-          }
-        ]
+        name: "Color",
+        attributes: [
+          { label: "red", value: "red", isActive: true },
+          { value: "green" },
+        ],
       },
       {
-        "specId": 1008,
-        "name": "功率",
-        "attributes": [
-          {
-            "itemId": 126,
-            "label": "8杠",
-            "value": "8杠",
-            "active": false,
-            "isActive": false,
-            "isDisabled": false
-          },
-          {
-            "itemId": 127,
-            "label": "350km/h",
-            "value": "350km/h",
-            "active": true,
-            "isActive": true,
-            "isDisabled": false
-          }
-        ]
-      }
-    ]
+        name: "Figure ",
+        attributes: [
+          { label: "stripe", value: "stripe" },
+          { label: "wave", value: "wave", isActive: true }, // 不存在 sku:["S","red","wave"]，会抛出错误且不会被选中
+        ],
+      },
+    ];
+
     const skuList = [
       {
-        "id": 383,
-        "attributes": [
-          "紫色",
-          "sxe123",
-          "8杠"
-        ],
-        "item_enable": 1001,
-        "stock": 21,
-        "price": 860,
-        "expired": false
+        id: 10,
+        attributes: ["S", "red", "stripe"],
+        stock: 0,
+        price: 10,
+        originalPrice: 100,
       },
       {
-        "id": 386,
-        "attributes": [
-          "黑色",
-          "sxe123",
-          "350km/h"
-        ],
-        "item_enable": 1001,
-        "stock": 524,
-        "price": 34.51,
-        "expired": false
+        id: "20",
+        attributes: ["S", "green", "wave"],
+        stock: 30,
+        price: 20,
+        originalPrice: 100,
       },
       {
-        "id": 387,
-        "attributes": [
-          "黄色",
-          "sxe123",
-          "8杠"
-        ],
-        "item_enable": 1001,
-        "stock": 211,
-        "price": 1000.01,
-        "expired": false
+        id: "30",
+        attributes: ["M", "red", "stripe"],
+        stock: 20,
+        price: 30,
+        originalPrice: 100,
       },
       {
-        "id": 388,
-        "attributes": [
-          "黄色",
-          "sxe123",
-          "350km/h"
-        ],
-        "item_enable": 1001,
-        "stock": 4974,
-        "price": 39,
-        "expired": false
-      }
-    ]
-    console.log('mounted setOptions', properties, skuList);
+        id: "40",
+        attributes: ["L", "red"],
+        stock: 15,
+        price: 40,
+        expired: true,
+        originalPrice: 100,
+      },
+    ];
+    this.skuList = skuList;
     this.setOptions({
       properties,
-      skuList,
+      skuList: skuList.filter((item) => item.stock > 0 && !item.expired),
     });
   },
   methods: {
     handleClick(propertyIndex, attributeIndex) {
       const attrbute = this.selectAttribute(propertyIndex, attributeIndex);
       console.log(attrbute);
+    },
+    disabledType(attr) {
+      if (attr.isDisabled) {
+        const expiredSku = this.skuList.find(sku => {
+          return sku.attributes.includes(attr.value) && sku.expired
+        })
+        const soldOutSku = this.skuList.find(sku => {
+          return sku.attributes.includes(attr.value) && sku.stock <= 0
+        })
+        if (expiredSku) {
+          return '已下架'
+        }
+        if (soldOutSku) {
+          return '无库存'
+        }
+      }
     },
     testFn() {
       const names = this.unselectedName();
@@ -193,6 +147,7 @@ export default {
 }
 
 .weight {
+  position: relative;
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -209,7 +164,15 @@ export default {
 }
 
 .disabledStyle {
-  background-color: #f7f7f7;
+  background-color: #e6e6e6;
+}
+
+.disabledText {
+  position: absolute;
+  top: -10px;
+  right: 0;
+  color: red;
+  font-size: 10px;
 }
 
 .seletedSpecifications {

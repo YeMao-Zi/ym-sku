@@ -6,7 +6,6 @@ import type {
   InitialValue,
   DataSource,
   Attribute,
-  Data,
   Options,
 } from "./type";
 
@@ -281,7 +280,9 @@ const useSku = <P extends Property, S extends Sku>(
 
     // 保护 pathFinder 未初始化的情况
     if (!pathFinder) {
-      throw new Error("pathFinder is not initialized, so pre-selected attributes cannot be processed.");
+      throw new Error(
+        "pathFinder is not initialized, so pre-selected attributes cannot be processed."
+      );
     }
 
     // 批量尝试加入已预选的 prime（避免在每次加入后重复计算 unDisabled）

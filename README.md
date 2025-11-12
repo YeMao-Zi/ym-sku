@@ -15,7 +15,7 @@ npm install ym-sku
 
 ## 示例
 
-![image-20241127152925671](https://s2.loli.net/2024/11/27/kICSYJcGjTPHBeu.png)
+![image-20251112131124665](https://s2.loli.net/2025/11/12/bxm8GhaZv2XdoQ4.png)
 
 [vueExample](https://codesandbox.io/p/devbox/ym-sku-vue-demo-r8xkxm?file=%2Fsrc%2FApp.vue)
 
@@ -196,6 +196,7 @@ const testFn = () => {
             disabledStyle: attribute?.isDisabled,
           }">
           <div>{{ attribute.label || attribute.value }}</div>
+          <div class="disabledText">{{ disabledType(attribute) }}</div>
         </div>
       </div>
     </div>
@@ -221,6 +222,7 @@ export default {
     });
 
     return {
+      skuList: [],
       dataSourse,
       selectAttribute,
       setOptions,
@@ -257,8 +259,7 @@ export default {
       {
         id: 10,
         attributes: ["S", "red", "stripe"],
-        expired: true,
-        stock: 12,
+        stock: 0,
         price: 10,
         originalPrice: 100,
       },
@@ -281,18 +282,36 @@ export default {
         attributes: ["L", "red"],
         stock: 15,
         price: 40,
+        expired: true,
         originalPrice: 100,
       },
     ];
+    this.skuList = skuList;
     this.setOptions({
       properties,
-      skuList,
+      skuList: skuList.filter((item) => item.stock > 0 && !item.expired),
     });
   },
   methods: {
     handleClick(propertyIndex, attributeIndex) {
       const attrbute = this.selectAttribute(propertyIndex, attributeIndex);
       console.log(attrbute);
+    },
+    disabledType(attr) {
+      if (attr.isDisabled) {
+        const expiredSku = this.skuList.find(sku => {
+          return sku.attributes.includes(attr.value) && sku.expired
+        })
+        const soldOutSku = this.skuList.find(sku => {
+          return sku.attributes.includes(attr.value) && sku.stock <= 0
+        })
+        if (expiredSku) {
+          return '已下架'
+        }
+        if (soldOutSku) {
+          return '无库存'
+        }
+      }
     },
     testFn() {
       const names = this.unselectedName();
@@ -315,6 +334,7 @@ export default {
 }
 
 .weight {
+  position: relative;
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -331,7 +351,15 @@ export default {
 }
 
 .disabledStyle {
-  background-color: #f7f7f7;
+  background-color: #e6e6e6;
+}
+
+.disabledText {
+  position: absolute;
+  top: -10px;
+  right: 0;
+  color: red;
+  font-size: 10px;
 }
 
 .seletedSpecifications {
