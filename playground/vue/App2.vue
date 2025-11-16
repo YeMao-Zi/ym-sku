@@ -1,13 +1,21 @@
 <template>
   <div>
-    <div v-for="(item, propertyIndex) in dataSourse.properties" :key="propertyIndex">
+    <div
+      v-for="(item, propertyIndex) in dataSourse.properties"
+      :key="propertyIndex"
+    >
       <div>{{ item.name }}</div>
       <div class="attrbute">
-        <div v-for="(attribute, attributeIndex) in item.attributes" :key="attributeIndex"
-          @click="handleClick(propertyIndex, attributeIndex)" class="weight" :class="{
+        <div
+          v-for="(attribute, attributeIndex) in item.attributes"
+          :key="attributeIndex"
+          @click="handleClick(propertyIndex, attributeIndex)"
+          class="weight"
+          :class="{
             seletedSpecifications: attribute.isActive,
             disabledStyle: attribute?.isDisabled,
-          }">
+          }"
+        >
           <div>{{ attribute.label || attribute.value }}</div>
           <div class="disabledText">{{ disabledType(attribute) }}</div>
         </div>
@@ -111,19 +119,42 @@ export default {
       console.log(attrbute);
     },
     disabledType(attr) {
-      if (attr.isDisabled) {
-        const expiredSku = this.skuList.find(sku => {
-          return sku.attributes.includes(attr.value) && sku.expired
-        })
-        const soldOutSku = this.skuList.find(sku => {
-          return sku.attributes.includes(attr.value) && sku.stock <= 0
-        })
-        if (expiredSku) {
-          return '已下架'
+      const selected = this.dataSourse.selected;
+      const properties = this.dataSourse.properties;
+      const unSelectName = this.unselectedName();
+      const activeProperty = properties.find((item) =>
+        item.attributes.map((a) => a.value).includes(attr.value)
+      );
+      const sameNameAttrs = activeProperty.attributes.map((item) => item.value);
+      const otherNameSelected = selected.filter(
+        (item) => !sameNameAttrs.includes(item)
+      );
+      const expiredSku = this.skuList.find((sku) => {
+        if (unSelectName.length) {
+          const isAllIncluded = otherNameSelected.every((item) =>
+            sku.attributes.includes(item)
+          );
+          return (
+            sku.attributes.includes(attr.value) && isAllIncluded && sku.expired
+          );
+        } else {
+          return sku.attributes.includes(attr.value) && sku.expired;
         }
-        if (soldOutSku) {
-          return '无库存'
-        }
+      });
+      const soldOutSku = this.skuList.find((sku) => {
+        const isAllIncluded = selected.every((item) =>
+          sku.attributes.includes(item)
+        );
+        return (
+          sku.attributes.includes(attr.value) && isAllIncluded && sku.stock <= 0
+        );
+      });
+      // console.log(attr, expiredSku, 'disabledType',sameNameAttrs, soldOutSku,otherNameSelected,selected)
+      if (expiredSku && attr.isDisabled) {
+        return "下架";
+      }
+      if (soldOutSku && selected.length) {
+        return "无库存";
       }
     },
     testFn() {
