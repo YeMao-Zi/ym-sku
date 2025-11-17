@@ -121,6 +121,10 @@ export default {
     disabledType(attr) {
       const selected = this.dataSourse.selected;
       const properties = this.dataSourse.properties;
+      const visibleSkuList = this.dataSourse.skuList;
+      const isPossible = visibleSkuList.find((item) =>
+        item.attributes.includes(attr.value)
+      );
       const unSelectName = this.unselectedName();
       const activeProperty = properties.find((item) =>
         item.attributes.map((a) => a.value).includes(attr.value)
@@ -153,7 +157,7 @@ export default {
       if (expiredSku && attr.isDisabled) {
         return "下架";
       }
-      if (soldOutSku && selected.length) {
+      if (soldOutSku && selected.length && !isPossible) {
         return "无库存";
       }
     },
